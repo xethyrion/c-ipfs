@@ -10,7 +10,7 @@ OBJS = init.o main.o ../../commands/argument.o
 ipfs: $(OBJS)
 	$(CC) -o $@ $^ $(LFLAGS)
 	
-all: ipfs
+all: $(DEPS)
 
 clean:
 	rm -f *.o

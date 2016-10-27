@@ -6,8 +6,10 @@
 #define __COMMANDS_COMMAND_H__
 
 #include "argument.h"
+#include "request.h"
+#include "command_option.h"
 
-struct help_text {
+struct HelpText {
 	char* tagline;
 	char* short_description;
 	char** synopsis_options_values;
@@ -20,15 +22,16 @@ struct help_text {
 	char* synopsis;
 };
 
-struct command {
-	//struct option* options;
-	struct argument** arguments;
+struct Command {
+	struct CommandOption** options;
+	int option_count;
+	struct Argument** arguments;
 	int argument_count;
-	//int (*pre_run)(struct request*);
-	//int (*run)(struct request*);
-	//int (*post_run)(struct request*);
+	int (*pre_run)(struct Request*);
+	int (*run)(struct Request*);
+	int (*post_run)(struct Request*);
 	//struct marshaller** marshallers;
-	struct help_text help_text;
+	struct HelpText help_text;
 
 	// a boolean to determine if this is an external
 	// binary.
@@ -37,5 +40,9 @@ struct command {
 	//struct type return_type;
 	char** subcommands;
 };
+
+// construction/destruction
+int init_command(struct Command* cmd);
+int uninit_command(struct Command* cmd);
 
 #endif // command.h

@@ -3,11 +3,11 @@
 
 #include "argument.h"
 
-int uninit_argument(struct argument* argument) {
+int uninit_argument(struct Argument* argument) {
 	return 1;
 }
 
-int init_argument(struct argument* argument, char* name, int required, int variadic, char* description) {
+int init_argument(struct Argument* argument, char* name, int required, int variadic, char* description) {
 	argument->name = name;
 	argument->required = required;
 	argument->variadic = variadic;
@@ -15,14 +15,14 @@ int init_argument(struct argument* argument, char* name, int required, int varia
 	return 1;
 }
 
-int init_string_argument(struct argument* argument, char* name, int required, int variadic, char* description) {
+int init_string_argument(struct Argument* argument, char* name, int required, int variadic, char* description) {
 	int retVal = init_argument(argument, name, required, variadic, description);
 	if (retVal)
 		argument->type = string;
 	return retVal;
 }
 
-int init_file_argument(struct argument* argument, char* name, int required, int variadic, char* description) {
+int init_file_argument(struct Argument* argument, char* name, int required, int variadic, char* description) {
 	int retVal = init_argument(argument, name, required, variadic, description);
 	if (retVal)
 		argument->type = file;

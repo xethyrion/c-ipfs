@@ -11,7 +11,7 @@
 #include <string.h>
 
 int test_get_init_command() {
-	struct command cmd = { 0 };
+	struct Command cmd = { 0 };
 	int retVal = 1;
 	// make sure its empty
 	if (cmd.help_text.tagline != NULL) {
@@ -36,7 +36,7 @@ int test_get_init_command() {
 		fprintf(stderr, "argument count should be 1");
 		retVal = 0;
 	} else {
-		struct argument arg1 = *(cmd.arguments[0]);
+		struct Argument arg1 = *(cmd.arguments[0]);
 		if (strncmp(arg1.name, "default-config", 14) != 0) {
 			fprintf(stderr, "arg1 wrong name. Expected %s but got %s\n", "default_config", arg1.name);
 			retVal = 0;

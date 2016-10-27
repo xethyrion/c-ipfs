@@ -5,7 +5,7 @@
 
 //const char* datastore_default_directory = "datastore";
 
-struct datastore {
+struct Datastore {
 	char* type;
 	char* path;
 	char* storage_max;

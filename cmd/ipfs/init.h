@@ -11,13 +11,13 @@
  * @param command the struct to fill
  * @returns 0 on failure, otherwise 1
  */
-int get_init_command(struct command* command);
+int get_init_command(struct Command* command);
 
 /***
  * Uninitializes all the dynamic memory caused by get_init_command
  * @param command the struct
  * @returns 0 on failure, otherwise 1
  */
-int uninit_command(struct command* command);
+int uninit_command(struct Command* command);
 
 #endif
