@@ -14,3 +14,4 @@ all: testit
 
 clean:
 	rm -f *.o
+	rm -f testit
