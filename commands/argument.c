@@ -4,15 +4,10 @@
 #include "argument.h"
 
 int uninit_argument(struct argument* argument) {
-	free(argument->name);
 	return 1;
 }
 
 int init_argument(struct argument* argument, char* name, int required, int variadic, char* description) {
-	argument->name = name == NULL ? NULL : strdup(name);
-	if (argument->name == NULL)
-		return 0;
-	strncpy(argument->name, name, strlen(name));
 	argument->name = name;
 	argument->required = required;
 	argument->variadic = variadic;

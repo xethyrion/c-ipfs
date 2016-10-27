@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-const char* datastore_default_directory = "datastore";
+//const char* datastore_default_directory = "datastore";
 
 struct datastore {
 	char* type;
