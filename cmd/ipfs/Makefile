@@ -14,3 +14,4 @@ all: ipfs
 
 clean:
 	rm -f *.o
+	rm -f ipfs
