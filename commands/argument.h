@@ -15,6 +15,7 @@ struct argument {
 };
 
 int init_argument(struct argument* argument, char* name, int required, int variadic, char* description);
+int uninit_argument(struct argument* argument);
 int init_string_argument(struct argument* argument, char* name, int required, int variadic, char* description);
 int init_file_argument(struct argument* argument, char* name, int required, int variadic, char* description);
 

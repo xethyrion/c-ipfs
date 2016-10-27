@@ -7,9 +7,16 @@ int get_init_command(struct command* cmd) {
 	// arguments
 	// initialize an array of arguments with size of 1
 	struct argument argument;
-	init_string_argument(&argument, "default-config", 0, 0, "Initialize with the given configuration");
+	int retVal = init_string_argument(&argument, "default-config", 0, 0, "Initialize with the given configuration");
 	argument.enable_stdin = 1;
-	struct argument* array[1] = { &argument };
+	struct argument* array[] = { &argument };
 	cmd->arguments = array;
+	cmd->argument_count = 1;
+	return retVal;
+}
+
+int uninit_command(struct command* cmd) {
+	for(int i = 0; i < cmd->argument_count; i++)
+		uninit_argument(cmd->arguments[i]);
 	return 0;
 }

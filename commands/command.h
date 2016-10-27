@@ -23,6 +23,7 @@ struct help_text {
 struct command {
 	//struct option* options;
 	struct argument** arguments;
+	int argument_count;
 	//int (*pre_run)(struct request*);
 	//int (*run)(struct request*);
 	//int (*post_run)(struct request*);

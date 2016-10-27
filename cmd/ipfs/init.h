@@ -6,6 +6,18 @@
 
 #include "../../commands/command.h"
 
+/***
+ * Returns a command structure customized for the init command
+ * @param command the struct to fill
+ * @returns 0 on failure, otherwise 1
+ */
 int get_init_command(struct command* command);
+
+/***
+ * Uninitializes all the dynamic memory caused by get_init_command
+ * @param command the struct
+ * @returns 0 on failure, otherwise 1
+ */
+int uninit_command(struct command* command);
 
 #endif
