@@ -22,7 +22,7 @@
 #include "mbedtls/x509.h"
 #include "mbedtls/rsa.h"
 
-int repo_config_identity_generate_keypair(unsigned char* private_key, unsigned char* public_key, unsigned long num_bits_for_keypair) {
+int repo_config_identity_generate_keypair(struct PrivateKey* private_key, unsigned long num_bits_for_keypair) {
 
 	mbedtls_rsa_context rsa;
 	mbedtls_entropy_context entropy;
@@ -58,50 +58,18 @@ int repo_config_identity_generate_keypair(unsigned char* private_key, unsigned c
 	}
 	retVal = 1;
 	
-	struct {
-		unsigned long long modulus;
-		unsigned long long public_exponent;
-	} pub_key;
+	// fill in values of structures
+	private_key->public_key.modulus = *(rsa.N.p);
+	private_key->public_key.exponent = *(rsa.E.p);
+	private_key->prime1 = *(rsa.DP.p);
+	private_key->prime2 = *(rsa.Q.p);
+	private_key->private_exponent = *(rsa.D.p);
 	
-	pub_key.modulus = *(rsa.N.p);
-	pub_key.public_exponent = *(rsa.E.p);
+	//TODO: fill in the rest of the precomputed values
+	private_key->precomputed_values.dp = *(rsa.DP.p);
+	private_key->precomputed_values.dq = *(rsa.DQ.p);
 	
-	struct {
-		unsigned long long modulus;
-		unsigned long long public_exponent;
-		unsigned long long private_exponent;
-		unsigned long long prime1;
-		unsigned long long prime2;
-		unsigned long long exponent1;
-		unsigned long long exponent2;
-		unsigned long long coefficient;
-	} priv_key;
-	
-	priv_key.modulus = *(rsa.N.p);
-	priv_key.public_exponent = *(rsa.E.p);
-	priv_key.private_exponent = *(rsa.D.p);
-	priv_key.prime1 = *(rsa.P.p);
-	priv_key.prime2 = *(rsa.Q.p);
-	//TODO: verify these 3
-	priv_key.exponent1 = *(rsa.DP.p);
-	priv_key.exponent2 = *(rsa.DQ.p);
-	priv_key.coefficient = *(rsa.QP.p);
-	
-	// convert keys to base 64 and then store
-	unsigned char* input_buf = malloc(sizeof(pub_key));
-	memcpy(input_buf, &pub_key, sizeof(pub_key));
-	size_t bufLen = base64_encode_length(input_buf, sizeof(pub_key));
-	public_key = malloc(sizeof(char) * bufLen);
-	retVal = base64_encode(input_buf, sizeof(pub_key), public_key, bufLen, &bufLen);
-	free(input_buf);
-	
-	input_buf = malloc(sizeof(priv_key));
-	memcpy(input_buf, &priv_key, sizeof(priv_key));
-	bufLen = base64_encode_length(input_buf, sizeof(pub_key));
-	private_key = malloc(sizeof(char) * bufLen);
-	retVal = base64_encode(input_buf, sizeof(priv_key), private_key, bufLen, &bufLen);
-	
-	retVal = 0;
+	retVal = 1;
 exit:
 
 	mbedtls_rsa_free( &rsa );
@@ -125,9 +93,11 @@ int repo_config_identity_new(struct Identity* identity, unsigned long num_bits_f
 	identity = malloc(sizeof(struct Identity));
 	if (num_bits_for_keypair < 1024)
 		return 0;
-	unsigned char* private_key;
-	unsigned char* public_key;
-	if (!repo_config_identity_generate_keypair(private_key, public_key, num_bits_for_keypair))
+	// generate the private key (& public)
+	if (!repo_config_identity_generate_keypair(&identity->private_key, num_bits_for_keypair))
 		return 0;
+	
+	// TODO: Get ID from public key
+	// TODO: Store peer id in identity struct
 	return 0;
 }

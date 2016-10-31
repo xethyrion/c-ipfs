@@ -9,11 +9,6 @@
 #ifndef test_repo_config_h
 #define test_repo_config_h
 
-#include "ipfs/repo/config/identity.h"
 
-int test_repo_config_identity_new() {
-	struct Identity* identity;
-	return repo_config_identity_new(identity, 2046);
-}
 
 #endif /* test_repo_config_h */
