@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "command_option.h"
+#include "ipfs/commands/command_option.h"
 
 int init_command_option(struct CommandOption* option, char* description) {
 	option->description = description;

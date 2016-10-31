@@ -11,7 +11,7 @@
 #include <string.h>
 
 #include "config.h"
-#include "../../os/utils.h"
+#include "ipfs/os/utils.h"
 
 
 /***
@@ -74,3 +74,83 @@ int config_path(char* config_root, char* extension, char* result, int max_len) {
 int config_get_file_name(char* path, char* result) {
 	return 0;
 }
+
+/***
+ * create a configuration based on the passed in parameters
+ * @param config the configuration struct to be filled in
+ * @param num_bits_for_keypair number of bits for the key pair
+ * @returns true(1) on success, otherwise 0
+ */
+int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair) {
+	//TODO: convert to c
+	struct Identity* identity;
+	repo_config_identity_new(identity, num_bits_for_keypair);
+	return 0;
+	//TODO
+	/*
+	identity, err := identityConfig(out, nBitsForKeypair)
+	if err != nil {
+		return nil, err
+	}
+	
+	bootstrapPeers, err := DefaultBootstrapPeers()
+	if err != nil {
+		return nil, err
+	}
+	
+	datastore, err := datastoreConfig()
+	if err != nil {
+		return nil, err
+	}
+	
+	conf := &Config{
+		
+		// setup the node's default addresses.
+		// NOTE: two swarm listen addrs, one tcp, one utp.
+	Addresses: Addresses{
+	Swarm: []string{
+		"/ip4/0.0.0.0/tcp/4001",
+		// "/ip4/0.0.0.0/udp/4002/utp", // disabled for now.
+		"/ip6/::/tcp/4001",
+	},
+	API:     "/ip4/127.0.0.1/tcp/5001",
+	Gateway: "/ip4/127.0.0.1/tcp/8080",
+	},
+		
+	Datastore: datastore,
+	Bootstrap: BootstrapPeerStrings(bootstrapPeers),
+	Identity:  identity,
+	Discovery: Discovery{MDNS{
+	Enabled:  true,
+	Interval: 10,
+	}},
+		
+		// setup the node mount points.
+	Mounts: Mounts{
+	IPFS: "/ipfs",
+	IPNS: "/ipns",
+	},
+		
+	Ipns: Ipns{
+	ResolveCacheSize: 128,
+	},
+		
+	Gateway: Gateway{
+	RootRedirect: "",
+	Writable:     false,
+	PathPrefixes: []string{},
+	HTTPHeaders: map[string][]string{
+		"Access-Control-Allow-Origin":  []string{"*"},
+		"Access-Control-Allow-Methods": []string{"GET"},
+		"Access-Control-Allow-Headers": []string{"X-Requested-With"},
+	},
+	},
+	Reprovider: Reprovider{
+	Interval: "12h",
+	},
+	}
+	
+	return conf, nil
+	 */
+}
+

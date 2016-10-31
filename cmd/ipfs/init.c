@@ -1,13 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "init.h"
-#include "../../commands/command_option.h"
-#include "../../commands/request.h"
-#include "../../core/ipfs_node.h"
-#include "../../core/builder.h"
-#include "../../repo/config/config.h"
-#include "../../repo/fsrepo/fs_repo.h"
+#include "ipfs/cmd/ipfs/init.h"
+#include "ipfs/commands/command_option.h"
+//#include "ipfs/commands/request.h"
+#include "ipfs/os/utils.h"
+#include "ipfs/core/ipfs_node.h"
+#include "ipfs/core/builder.h"
+#include "ipfs/repo/config/config.h"
+#include "ipfs/repo/fsrepo/fs_repo.h"
 
 const int nBitsForKeypairDefault = 2048;
 
@@ -21,10 +22,11 @@ int init_pre_run(struct Request* request) {
 	return 0;
 }
 
-int initialize_ipns_keyspace(char* repoRoot) {
+int initialize_ipns_keyspace(char* repo_root) {
 	//TODO: open fs repo
 	struct FSRepo repo;
-	int retVal = fs_repo_open(repoRoot, &repo);
+	// get the path
+	int retVal = fs_repo_open(repo_root, &repo);
 	//TODO: make a new node, then close it
 	//TODO: setup offline routing on new node
 	struct IpfsNode* ipfs_node;
@@ -38,19 +40,26 @@ int initialize_ipns_keyspace(char* repoRoot) {
 
 /**
  * called by init_run, to do the heavy lifting
- * @param outFile an output stream (stdout)
- * @param repoRoot a string
+ * @param out_file an output stream (stdout)
+ * @param repo_root a string
  * @param empty true(1) if empty, false(0) if not
- * @param nBitsForKeyPair number of bits for key pair
+ * @param num_bits_for_keypair number of bits for key pair
  * @param conf the configuration struct
  * @returns 0 on error, 1 on success
  */
-int do_init(FILE* outFile, char* repoRoot, int empty, int nBitsForKeyPair, struct Config* conf) {
-	//TODO: verify that it is not already initialized
+int do_init(FILE* out_file, char* repo_root, int empty, int num_bits_for_keypair, struct RepoConfig* conf) {
+	// make sure the directory is writable
+	if (!os_utils_directory_writeable(repo_root))
+		return 0;
+	// verify that it is not already initialized
+	if (!fs_repo_is_initialized(repo_root))
+		return 0;
 	//TODO: If the conf is null, make one
+	if (conf == NULL)
+		repo_config_init(conf, num_bits_for_keypair);
 	//TODO: initialize the fs repo
 	//TODO: add default assets
-	return initialize_ipns_keyspace(repoRoot);
+	return initialize_ipns_keyspace(repo_root);
 }
 
 /***
@@ -62,11 +71,11 @@ int init_run(struct Request* request) {
 	// TODO: make sure offline
 	// TODO: check parameters for logic errors
 	// TODO: Initialize
-	struct Config conf;
+	struct RepoConfig conf;
 	// TODO: handle files in request
 	// do the heavy lifting
-	int nBitsForKeyPair = request->cmd->options[1]->default_int_val;
-	do_init(stdout, request->invoc_context->config_root, 1, nBitsForKeyPair, &conf);
+	int num_bits_for_key_pair = request->cmd->options[1]->default_int_val;
+	do_init(stdout, request->invoc_context->config_root, 1, num_bits_for_key_pair, &conf);
 	
 	return 0;
 }

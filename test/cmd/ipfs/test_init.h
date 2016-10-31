@@ -4,8 +4,8 @@
 #ifndef __TEST_INIT_H__
 #define __TEST_INIT_H__
 
-#include "../../../cmd/ipfs/init.h"
-#include "../../../commands/argument.h"
+#include "ipfs/cmd/ipfs/init.h"
+#include "ipfs/commands/argument.h"
 
 #include <stdio.h>
 #include <string.h>
