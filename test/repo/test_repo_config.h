@@ -16,6 +16,7 @@ int test_repo_config_init() {
 	int retVal = repo_config_init(&repoConfig, 2048, "/Users/JohnJones/.ipfs");
 	if (retVal == 0)
 		return 0;
+	
 	// now tear it apart to check for anything broken
 
 	// addresses
@@ -30,6 +31,8 @@ int test_repo_config_init() {
 	retVal = strncmp(repoConfig.datastore.path, "/Users/JohnJones/.ipfs/datastore", 32);
 	if (retVal != 0)
 		return 0;
+	
+	repo_config_free(&repoConfig);
 	
 	return 1;
 }

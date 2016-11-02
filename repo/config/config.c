@@ -134,3 +134,14 @@ int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypai
 	return 1;
 }
 
+int repo_config_free(struct RepoConfig* config) {
+	repo_config_bootstrap_peers_free(&(config->peer_addresses));
+	repo_config_datastore_free(&(config->datastore));
+	repo_config_addresses_free(&(config->addresses));
+	return 1;
+}
+
+int repo_config_martial_to_json(struct RepoConfig* config) {
+	return 0;
+}
+

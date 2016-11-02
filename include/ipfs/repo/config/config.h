@@ -74,4 +74,11 @@ int config_path(char* config_root, char* extension, char* result, int max_len);
  */
 int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair, char* repo_path);
 
+/***
+ * free all resources that were allocated to store config information
+ * @param config the config
+ * @returns true(1)
+ */
+int repo_config_free(struct RepoConfig* config);
+
 #endif

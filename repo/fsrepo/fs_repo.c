@@ -100,6 +100,9 @@ int fs_repo_open(char* repo_path, struct FSRepo* repo) {
 	//TODO: lock
 	// get the path set in the repo struct
 	int retVal = repo_new_fs_repo(repo_path, repo);
+	if (retVal == 0)
+		return 0;
+	
 	// check if initialized
 	if (!repo_check_initialized(repo->path))
 		return 0;

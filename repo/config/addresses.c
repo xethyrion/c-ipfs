@@ -32,5 +32,6 @@ int repo_config_addresses_init(struct Addresses* addresses, char* api, char* gat
 int repo_config_addresses_free(struct Addresses* addresses) {
 	free(addresses->api);
 	free(addresses->gateway);
+	repo_config_swarm_address_free(&(addresses->swarm));
 	return 1;
 }
