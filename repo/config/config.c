@@ -12,7 +12,8 @@
 
 #include "config.h"
 #include "ipfs/os/utils.h"
-
+#include "ipfs/repo/config/bootstrap_peers.h"
+#include "ipfs/repo/config/swarm.h"
 
 /***
  * public
@@ -81,76 +82,55 @@ int config_get_file_name(char* path, char* result) {
  * @param num_bits_for_keypair number of bits for the key pair
  * @returns true(1) on success, otherwise 0
  */
-int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair) {
-	//TODO: convert to c
-	struct Identity* identity;
-	repo_config_identity_new(identity, num_bits_for_keypair);
-	return 0;
-	//TODO
-	/*
-	identity, err := identityConfig(out, nBitsForKeypair)
-	if err != nil {
-		return nil, err
-	}
+int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair, char* repo_path) {
 	
-	bootstrapPeers, err := DefaultBootstrapPeers()
-	if err != nil {
-		return nil, err
-	}
+	// identity
+	int retVal = repo_config_identity_new(&(config->identity), num_bits_for_keypair);
+	if (retVal == 0)
+		return 0;
 	
-	datastore, err := datastoreConfig()
-	if err != nil {
-		return nil, err
-	}
+	// bootstrap peers
+	retVal = repo_config_bootstrap_peers_retrieve(&(config->peer_addresses));
+	if (retVal == 0)
+		return 0;
 	
-	conf := &Config{
-		
-		// setup the node's default addresses.
-		// NOTE: two swarm listen addrs, one tcp, one utp.
-	Addresses: Addresses{
-	Swarm: []string{
-		"/ip4/0.0.0.0/tcp/4001",
-		// "/ip4/0.0.0.0/udp/4002/utp", // disabled for now.
-		"/ip6/::/tcp/4001",
-	},
-	API:     "/ip4/127.0.0.1/tcp/5001",
-	Gateway: "/ip4/127.0.0.1/tcp/8080",
-	},
-		
-	Datastore: datastore,
-	Bootstrap: BootstrapPeerStrings(bootstrapPeers),
-	Identity:  identity,
-	Discovery: Discovery{MDNS{
-	Enabled:  true,
-	Interval: 10,
-	}},
-		
-		// setup the node mount points.
-	Mounts: Mounts{
-	IPFS: "/ipfs",
-	IPNS: "/ipns",
-	},
-		
-	Ipns: Ipns{
-	ResolveCacheSize: 128,
-	},
-		
-	Gateway: Gateway{
-	RootRedirect: "",
-	Writable:     false,
-	PathPrefixes: []string{},
-	HTTPHeaders: map[string][]string{
-		"Access-Control-Allow-Origin":  []string{"*"},
-		"Access-Control-Allow-Methods": []string{"GET"},
-		"Access-Control-Allow-Headers": []string{"X-Requested-With"},
-	},
-	},
-	Reprovider: Reprovider{
-	Interval: "12h",
-	},
-	}
+	// datastore
+	retVal = repo_config_datastore_init(&(config->datastore), repo_path);
+	if (retVal == 0)
+		return 0;
+
+	retVal = repo_config_addresses_init(&(config->addresses), "/ip4/127.0.0.1/tcp/5001", "/ip4/127.0.0.1/tcp/8080");
+	if (retVal == 0)
+		return 0;
 	
-	return conf, nil
-	 */
+	// swarm addresses
+	char** address_array = (char * []){ "/ip4/0.0.0.0/tcp/4001", "/ip6/::/tcp/4001" };
+	retVal = repo_config_swarm_address_init(&(config->addresses.swarm), address_array, 2);
+	if (retVal == 0)
+		return 0;
+	
+	config->discovery.mdns.enabled = 1;
+	config->discovery.mdns.interval = 10;
+	
+	config->mounts.ipfs = "/ipfs";
+	config->mounts.ipns = "/ipns";
+	
+	config->ipns.resolve_cache_size = 128;
+	
+	config->reprovider.interval = "12h";
+	
+	config->gateway.root_redirect = "";
+	config->gateway.writable = 0;
+	
+	config->gateway.path_prefixes.num_elements = 0;
+
+	// gateway http headers
+	char** header_array = (char * []) { "Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers" };
+	char** header_values = (char*[])  { "*", "GET", "X-Requested-With" };
+	retVal = repo_config_gateway_http_header_init(&(config->gateway.http_headers), header_array, header_values, 3);
+	if (retVal == 0)
+		return 0;
+	
+	return 1;
 }
 

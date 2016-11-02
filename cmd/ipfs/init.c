@@ -56,7 +56,7 @@ int do_init(FILE* out_file, char* repo_root, int empty, int num_bits_for_keypair
 		return 0;
 	//TODO: If the conf is null, make one
 	if (conf == NULL)
-		repo_config_init(conf, num_bits_for_keypair);
+		repo_config_init(conf, num_bits_for_keypair, repo_root);
 	//TODO: initialize the fs repo
 	//TODO: add default assets
 	return initialize_ipns_keyspace(repo_root);

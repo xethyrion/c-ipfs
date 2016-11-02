@@ -3,21 +3,46 @@
 
 #include "datastore.h"
 #include "identity.h"
+#include "swarm.h"
+#include "bootstrap_peers.h"
+#include "addresses.h"
+#include "gateway.h"
+
+struct MDNS {
+	int enabled;
+	int interval;
+};
+
+struct Discovery {
+	struct MDNS mdns;
+};
+
+struct Mounts {
+	char* ipfs;
+	char* ipns;
+};
+
+struct Ipns {
+	int resolve_cache_size;
+};
+
+struct Reprovider {
+	char* interval;
+};
 
 struct RepoConfig {
 	struct Identity identity;
 	struct Datastore datastore;
-	//struct address* addresses;
-	//struct mount* mounts;
-	//struct discovery discovery;
-	//struct ipns ipns;
-	//struct bootstrap* peer_addresses;
+	struct Addresses addresses;
+	struct Mounts mounts;
+	struct Discovery discovery;
+	struct Ipns ipns;
+	struct BootstrapPeers peer_addresses;
 	//struct tour tour;
-	//struct gateway gateway;
+	struct Gateway gateway;
 	//struct supernode_routing supernode_client_config;
 	//struct api api;
-	//struct swarm swarm;
-	//struct reprovider reprovider;
+	struct Reprovider reprovider;
 };
 
 /**
@@ -47,6 +72,6 @@ int config_path(char* config_root, char* extension, char* result, int max_len);
  * @param num_bits_for_keypair number of bits for the key pair
  * @returns true(1) on success, otherwise 0
  */
-int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair);
+int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair, char* repo_path);
 
 #endif

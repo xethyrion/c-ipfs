@@ -84,20 +84,19 @@ exit:
  */
 
 /***
- * initializes a new Identity (this should be moved to identity.h)
+ * initializes a new Identity
  * @param identity the identity to fill
  * @param num_bits_for_keypair the number of bits for the keypair
  * @returns true(1) on success, false(0) otherwise
  */
 int repo_config_identity_new(struct Identity* identity, unsigned long num_bits_for_keypair) {
-	identity = malloc(sizeof(struct Identity));
 	if (num_bits_for_keypair < 1024)
 		return 0;
 	// generate the private key (& public)
-	if (!repo_config_identity_generate_keypair(&identity->private_key, num_bits_for_keypair))
+	if (!repo_config_identity_generate_keypair( &(identity->private_key), num_bits_for_keypair))
 		return 0;
 	
 	// TODO: Get ID from public key
 	// TODO: Store peer id in identity struct
-	return 0;
+	return 1;
 }

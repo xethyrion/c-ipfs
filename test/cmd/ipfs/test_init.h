@@ -8,7 +8,7 @@
 #include "ipfs/commands/argument.h"
 
 #include <stdio.h>
-#include <string.h>
+//#include <string.h>
 
 int test_get_init_command() {
 	struct Command cmd = { 0 };

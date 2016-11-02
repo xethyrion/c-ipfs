@@ -15,8 +15,15 @@
 #include "ipfs/repo/config/base64.h"
 
 int test_repo_config_identity_new() {
-	struct Identity* identity;
-	return repo_config_identity_new(identity, 2046);
+	struct Identity identity;
+	int retVal = repo_config_identity_new(&identity, 2046);
+	// now examine it
+	int privateKeySize = sizeof(identity.private_key);
+	if (privateKeySize != 72) {
+		printf("Private key structure size should be 72");
+		retVal = 0;
+	}
+	return retVal;
 }
 
 // test this key
@@ -25,9 +32,17 @@ int test_repo_config_identity_private_key() {
 	size_t decoded_len = base64_decode_length(priv_b64, strlen(priv_b64));
 	char* out_buff = malloc(sizeof(char) * decoded_len);
 	base64_decode(priv_b64, strlen(priv_b64), out_buff, decoded_len, &decoded_len);
+	char str[decoded_len];
+	int j = 0;
 	for (int i = 0; i < decoded_len; i++) {
-		printf("%hhX ", out_buff[i]);
+		if (out_buff[i] >= 32 && out_buff[i] <= 127) {
+			str[j] = out_buff[i];
+			j++;
+		}
+		printf("%hhX-%c ", out_buff[i], out_buff[i]);
 	}
+	out_buff[j] = 0;
+	printf("String: %s", str);
 	// now test
 	return 0;
 	
