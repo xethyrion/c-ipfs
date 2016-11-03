@@ -1,4 +1,3 @@
-#include "testit.h"
 #include "repo/test_repo_config.h"
 #include "repo/test_repo_identity.h"
 #include "repo/test_repo_bootstrap_peers.h"

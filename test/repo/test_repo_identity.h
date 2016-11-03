@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 #include "ipfs/repo/config/identity.h"
-#include "ipfs/repo/config/base64.h"
+#include "libp2p/crypto/encoding/base64.h"
 
 int test_repo_config_identity_new() {
 	struct Identity identity;
