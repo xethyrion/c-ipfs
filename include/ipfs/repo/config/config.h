@@ -52,7 +52,7 @@ struct RepoConfig {
  * @param result the full filename including the path
  * @returns true(1) on success, false(0) otherwise
  */
-int config_get_file_name(char* path, char* result);
+int repo_config_get_file_name(char* path, char** result);
 
 /***
  * Returns the path "extension" relative to the configuration root.

@@ -16,6 +16,7 @@ int testit(const char* name, int (*func)(void)) {
 
 int main(int argc, char** argv) {
 	testit("test_repo_config_init", test_repo_config_init);
+	testit("test_repo_config_write", test_repo_config_write);
 	testit("test_repo_config_identity_new", test_repo_config_identity_new);
 	testit("test_repo_config_identity_private_key", test_repo_config_identity_private_key);
 	testit("test_reop_bootstrap_peers_init", test_repo_bootstrap_peers_init);

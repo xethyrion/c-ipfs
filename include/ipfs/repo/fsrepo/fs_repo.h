@@ -5,6 +5,8 @@
 #define fs_repo_h
 
 #include <stdio.h>
+#include "ipfs/repo/config/config.h"
+
 
 /**
  * a structure to hold the repo info
@@ -31,5 +33,14 @@ int fs_repo_open(char* repo_path, struct FSRepo* repo);
  * @returns true(1) if it is initialized, otherwise false(0)
  */
 int fs_repo_is_initialized(char* repo_path);
+
+/**
+ * write the config file to disk
+ * @param path the path to the file
+ * @param config the config structure
+ * @returns true(1) on success
+ */
+int fs_repo_write_config_file(char* path, struct RepoConfig* config);
+
 
 #endif /* fs_repo_h */

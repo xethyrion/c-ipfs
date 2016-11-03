@@ -28,6 +28,8 @@ int repo_config_swarm_address_init(struct SwarmAddresses* swarm_addresses, char*
 		swarm_addresses->addresses[i] = newString;
 	}
 	
+	swarm_addresses->num_addresses = array_length;
+	
 	return 1;
 }
 

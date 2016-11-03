@@ -72,8 +72,13 @@ int config_path(char* config_root, char* extension, char* result, int max_len) {
  * @param result the full filename including the path
  * @returns true(1) on success, false(0) otherwise
  */
-int config_get_file_name(char* path, char* result) {
-	return 0;
+int repo_config_get_file_name(char* path, char** result) {
+	unsigned long max_len = strlen(path) + 8;
+	*result = malloc(sizeof(char) * max_len);
+	if (result == NULL)
+		return 0;
+	
+	return os_utils_filepath_join(path, "/config", *result, max_len);
 }
 
 /***
