@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -O0
-DEPS = repo.h
+CFLAGS = -O0 -I../include -I../../c-libp2p/include
+DEPS = 
 OBJS = repo.o 
 
 %.o: %.c $(DEPS)

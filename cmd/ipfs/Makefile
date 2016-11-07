@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -O0
 LFLAGS =
-DEPS = init.h
+DEPS = 
 OBJS = init.o main.o ../../commands/argument.o
 
 %.o: %.c $(DEPS)

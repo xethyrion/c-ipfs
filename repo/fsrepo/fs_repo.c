@@ -6,7 +6,7 @@
 //  Copyright © 2016 JMJAtlanta. All rights reserved.
 //
 
-#include "fs_repo.h"
+#include "ipfs/repo/fsrepo/fs_repo.h"
 #include "ipfs/os/utils.h"
 /** 
  * private methods
@@ -222,7 +222,7 @@ int fs_repo_init(char* path, struct RepoConfig* config) {
 		return 0;
 	
 	// TODO: Implement this method
-	retVal = fs_repo_defaultds_init(path, config);
+	//retVal = fs_repo_defaultds_init(path, config);
 	if (retVal == 0)
 		return 0;
 	

@@ -7,7 +7,7 @@
 //
 #include <stdlib.h>
 
-#include "command.h"
+#include "ipfs/commands/command.h"
 
 int init_command(struct Command* cmd) {
 	// allocate memory for Argument array

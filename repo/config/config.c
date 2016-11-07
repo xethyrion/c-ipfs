@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "config.h"
+#include "ipfs/repo/config/config.h"
 #include "ipfs/os/utils.h"
 #include "ipfs/repo/config/bootstrap_peers.h"
 #include "ipfs/repo/config/swarm.h"

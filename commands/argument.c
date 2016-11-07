@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "argument.h"
+#include "ipfs/commands/argument.h"
 
 int uninit_argument(struct Argument* argument) {
 	return 1;

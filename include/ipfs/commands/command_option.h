@@ -9,6 +9,8 @@
 #ifndef __COMMANDS_COMMAND_OPTION_H__
 #define __COMMANDS_COMMAND_OPTION_H__
 
+#include <stdint.h>
+
 enum Kind { invalid, boolean, integer, unsignedInt, decimal, str };
 
 struct CommandOption {

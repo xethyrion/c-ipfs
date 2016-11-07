@@ -5,6 +5,7 @@ all:
 	cd os; make all;
 	cd repo; make all;
 	cd test; make all;
+	cd thirdparty; make all;
 	
 clean:
 	cd cmd; make clean;
@@ -13,3 +14,5 @@ clean:
 	cd os; make clean;
 	cd repo; make clean;
 	cd test; make clean;
+	cd thirdparty; make clean;
+	

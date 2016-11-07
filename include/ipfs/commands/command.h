@@ -5,8 +5,8 @@
 #ifndef __COMMANDS_COMMAND_H__
 #define __COMMANDS_COMMAND_H__
 
-#include "argument.h"
-#include "request.h"
+#include "ipfs/commands/argument.h"
+#include "ipfs/commands/request.h"
 #include "command_option.h"
 
 struct HelpText {
