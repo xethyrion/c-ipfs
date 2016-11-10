@@ -1,3 +1,7 @@
+
+DEBUG = true
+export DEBUG
+
 all:
 	cd cmd; make all;
 	cd commands; make all;

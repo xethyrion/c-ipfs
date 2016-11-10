@@ -11,13 +11,13 @@
  * @param command the struct to fill
  * @returns 0 on failure, otherwise 1
  */
-int get_init_command(struct Command* command);
+int ipfs_cmd_ipfs_init_command_new(struct Command* command);
 
 /***
  * Uninitializes all the dynamic memory caused by get_init_command
  * @param command the struct
  * @returns 0 on failure, otherwise 1
  */
-int uninit_command(struct Command* command);
+int ipfs_cmd_ipfs_init_command_free(struct Command* command);
 
 #endif

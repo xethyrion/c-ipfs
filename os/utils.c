@@ -46,6 +46,6 @@ int os_utils_file_exists(char* file_name) {
 }
 
 int os_utils_directory_writeable(char* path) {
-	int result = access("/root/", W_OK);
+	int result = access(path, W_OK);
 	return result == 0;
 }

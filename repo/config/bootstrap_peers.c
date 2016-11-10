@@ -29,10 +29,12 @@ int repo_config_bootstrap_peers_retrieve(struct BootstrapPeers* list) {
 	list->num_peers = 9;
 	// allocate memory for list
 	list->peers = malloc(sizeof(struct IPFSAddr*) * list->num_peers);
+	if (list->peers == NULL)
+		return 0;
 	
 	for(int i = 0; i < list->num_peers; i++) {
 		// allocate memory for struct
-		struct IPFSAddr* currAddr = malloc(sizeof(struct IPFSAddr));
+		struct IPFSAddr* currAddr = (struct IPFSAddr*)malloc(sizeof(struct IPFSAddr));
 		if (currAddr == NULL)
 			return 0;
 		// allocate memory for string
@@ -44,11 +46,12 @@ int repo_config_bootstrap_peers_retrieve(struct BootstrapPeers* list) {
 }
 
 int repo_config_bootstrap_peers_free(struct BootstrapPeers* list) {
-	int array_size = sizeof(list);
 	
-	for(int i = 0; i < array_size; i++) {
-		ipfsaddr_free(list->peers[i]);
-		free(list->peers[i]);
+	for(int i = 0; i < list->num_peers; i++) {
+		if (list->peers[i] != NULL) {
+			ipfsaddr_free(list->peers[i]);
+			free(list->peers[i]);
+		}
 	}
 	return 1;
 }

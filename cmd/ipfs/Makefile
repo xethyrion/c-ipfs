@@ -1,5 +1,10 @@
 CC = gcc
-CFLAGS = -O0
+CFLAGS = -O0 -I../../include -I../../../c-libp2p/include
+
+ifdef DEBUG
+CFLAGS += -g3
+endif
+
 LFLAGS =
 DEPS = 
 OBJS = init.o main.o ../../commands/argument.o
@@ -10,7 +15,7 @@ OBJS = init.o main.o ../../commands/argument.o
 ipfs: $(OBJS)
 	$(CC) -o $@ $^ $(LFLAGS)
 	
-all: $(DEPS)
+all: $(OBJS)
 
 clean:
 	rm -f *.o

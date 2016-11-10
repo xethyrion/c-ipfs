@@ -6,6 +6,8 @@
 //  Copyright © 2016 JMJAtlanta. All rights reserved.
 //
 
+#include "libp2p/crypto/encoding/base64.h"
+
 #include "ipfs/repo/fsrepo/fs_repo.h"
 #include "ipfs/os/utils.h"
 /** 
@@ -27,7 +29,14 @@ int repo_config_write_config_file(char* full_filename, struct RepoConfig* config
 	fprintf(out_file, " \"Identity\": {\n");
 	fprintf(out_file, "  \"PeerID\": \"%s\",\n", config->identity.peer_id);
 	// TODO: print correct format of private key
-	//fprintf(out_file, "  \"PrivKey\": \"%s\"\n", config->identity.private_key.base64);
+	// first base 64 it
+	size_t encoded_size = base64_encode_length(config->identity.private_key.der, config->identity.private_key.der_length);
+	unsigned char encoded_buffer[encoded_size + 1];
+	int retVal = base64_encode(config->identity.private_key.der, config->identity.private_key.der_length, encoded_buffer, encoded_size, &encoded_size);
+	if (retVal == 0)
+		return 0;
+	encoded_buffer[encoded_size] = 0;
+	fprintf(out_file, "  \"PrivKey\": \"%s\"\n", encoded_buffer);
 	fprintf(out_file, " },\n");
 	fprintf(out_file, " \"Datastore\": {\n");
 	fprintf(out_file, "  \"Type\": \"%s\",\n", config->datastore.type);
@@ -98,13 +107,30 @@ int repo_config_write_config_file(char* full_filename, struct RepoConfig* config
  * @param repo the struct to fill in
  * @returns false(0) if something bad happened, otherwise true(1)
  */
-int repo_new_fs_repo(char* repo_path, struct FSRepo* repo) {
-	// get the user's home directory
-	char* home_dir = os_utils_get_homedir();
-	unsigned long newPathLen = strlen(home_dir) + strlen(repo_path) + 2;  // 1 for slash and 1 for end
-	char* newPath = malloc(sizeof(char) * newPathLen);
-	os_utils_filepath_join(os_utils_get_homedir(), repo_path, newPath, newPathLen);
-	repo->path = newPath;
+int fs_repo_new_fs_repo(char* repo_path, struct FSRepo* repo) {
+	if (repo_path == NULL) {
+		// get the user's home directory
+		char* home_dir = os_utils_get_homedir();
+		char* default_subdir = "/.ipfs";
+		unsigned long newPathLen = strlen(home_dir) + strlen(default_subdir) + 2;  // 1 for slash and 1 for end
+		char* newPath = malloc(sizeof(char) * newPathLen);
+		os_utils_filepath_join(os_utils_get_homedir(), default_subdir, newPath, newPathLen);
+		repo->path = newPath;
+	} else {
+		int len = strlen(repo_path) + 1;
+		repo->path = (char*)malloc(len);
+		strncpy(repo->path, repo_path, len);
+	}
+	return 1;
+}
+
+/**
+ * Cleans up memory
+ * @param repo the struct to clean up
+ * @returns true(1) on success
+ */
+int fs_repo_free(struct FSRepo* repo) {
+	free(repo->path);
 	return 1;
 }
 
@@ -156,7 +182,7 @@ int repo_check_initialized(char* full_path) {
 int fs_repo_open_config(struct FSRepo* repo) {
 	//TODO: open config file
 	//TODO: read into the FSRepo struct
-	return 0;
+	return 1;
 }
 
 /***
@@ -165,7 +191,8 @@ int fs_repo_open_config(struct FSRepo* repo) {
  * @returns 0 on failure, otherwise 1
  */
 int fs_repo_open_datastore(struct FSRepo* repo) {
-	return 0;
+	//TODO: this
+	return 1;
 }
 
 /**
@@ -181,22 +208,32 @@ int fs_repo_open_datastore(struct FSRepo* repo) {
 int fs_repo_open(char* repo_path, struct FSRepo* repo) {
 	//TODO: lock
 	// get the path set in the repo struct
-	int retVal = repo_new_fs_repo(repo_path, repo);
-	if (retVal == 0)
+	int retVal = fs_repo_new_fs_repo(repo_path, repo);
+	if (retVal == 0) {
+		fs_repo_free(repo);
 		return 0;
+	}
 	
 	// check if initialized
-	if (!repo_check_initialized(repo->path))
+	if (!repo_check_initialized(repo->path)) {
+		fs_repo_free(repo);
 		return 0;
+	}
 	//TODO: lock the file (remember to unlock)
 	//TODO: check the version, and make sure it is correct
 	//TODO: make sure the directory is writable
 	//TODO: open the config
-	fs_repo_open_config(repo);
+	if (!fs_repo_open_config(repo)) {
+		fs_repo_free(repo);
+		return 0;
+	}
 	//TODO: open the datastore. Note: the config file has the datastore type
-	fs_repo_open_datastore(repo);
+	if (!fs_repo_open_datastore(repo)) {
+		fs_repo_free(repo);
+		return 0;
+	}
 	
-	return 0;
+	return 1;
 }
 
 /***
@@ -210,6 +247,12 @@ int fs_repo_is_initialized(char* repo_path) {
 	return fs_repo_is_initialized_unsynced(repo_path);
 }
 
+/**
+ * Initializes a new FSRepo at the given path with the provided config
+ * @param path the path to use
+ * @param config the information for the config file
+ * @returns true(1) on success
+ */
 int fs_repo_init(char* path, struct RepoConfig* config) {
 	// TODO: Do a lock so 2 don't do this at the same time
 	

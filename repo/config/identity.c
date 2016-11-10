@@ -30,3 +30,9 @@ int repo_config_identity_new(struct Identity* identity, unsigned long num_bits_f
 	// TODO: Store peer id in identity struct
 	return 1;
 }
+
+int repo_config_identity_free(struct Identity* identity) {
+	if (identity->private_key.der != NULL)
+		free(identity->private_key.der);
+	return 0;
+}

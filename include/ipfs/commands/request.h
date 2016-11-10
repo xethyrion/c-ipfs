@@ -17,7 +17,7 @@ struct Request {
 	//optmap options;
 	char* arguments;
 	//file[] files;
-	struct Command* cmd;
+	struct Command cmd;
 	struct Context* invoc_context;
 	//context rctx;
 	//map[string]Option optionDefs;

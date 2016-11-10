@@ -21,4 +21,11 @@ struct Identity {
  */
 int repo_config_identity_new(struct Identity* identity, unsigned long num_bits_for_keypair);
 
+/***
+ * Frees resources held by Identity
+ * @param identity the identity that we're cleaning up
+ * @returns true(0)
+ */
+int repo_config_identity_free(struct Identity* identity);
+
 #endif /* identity_h */

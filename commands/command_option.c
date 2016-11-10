@@ -11,7 +11,7 @@
 
 #include "ipfs/commands/command_option.h"
 
-int init_command_option(struct CommandOption* option, char* description) {
+int commands_command_option_init(struct CommandOption* option, char* description) {
 	option->description = description;
 	// allocate memory for names
 	option->names = malloc(option->name_count * sizeof(char*));
@@ -20,7 +20,7 @@ int init_command_option(struct CommandOption* option, char* description) {
 	return 1;
 }
 
-int uninit_option(struct CommandOption* option) {
+int commands_command_option_free(struct CommandOption* option) {
 	free(option->names);
 	return 0;
 }

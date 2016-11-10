@@ -9,7 +9,7 @@
 
 #include "ipfs/commands/command.h"
 
-int init_command(struct Command* cmd) {
+int commands_command_init(struct Command* cmd) {
 	// allocate memory for Argument array
 	cmd->arguments = malloc(cmd->argument_count * sizeof(struct Argument*));
 	if (cmd->arguments == NULL)
@@ -27,12 +27,14 @@ int init_command(struct Command* cmd) {
 	return 1;
 }
 
-int uninit_command(struct Command* cmd) {
+int commands_command_free(struct Command* cmd) {
+	// arguments
 	for(int i = 0; i < cmd->argument_count; i++)
-		uninit_argument(cmd->arguments[i]);
+		commands_argument_free(cmd->arguments[i]);
 	free(cmd->arguments);
+	//command options
 	for(int i = 0; i < cmd->option_count; i++)
-		uninit_option(cmd->options[i]);
+		commands_command_option_free(cmd->options[i]);
 	free(cmd->options);
 	return 0;
 }

@@ -25,9 +25,19 @@ struct CommandOption {
 	char* default_string_val;
 };
 
-// constructors
-int init_command_option(struct CommandOption* option, char* description);
-// destructors
-int uninit_option(struct CommandOption* option);
+/***
+ * Allocate the resources needed for a command option
+ * @param option the CommandOption to initialize
+ * @param description a description of this CommandOption
+ * @returns true(1) on success
+ */
+int commands_command_option_init(struct CommandOption* option, char* description);
+
+/***
+ * Cleans up the resources of a CommandOption
+ * @param option the CommandOption to clean up
+ * @returns true(1)
+ */
+int commands_command_option_free(struct CommandOption* option);
 
 #endif /* option_h */

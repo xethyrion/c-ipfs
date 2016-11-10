@@ -6,8 +6,11 @@
 #define __COMMANDS_COMMAND_H__
 
 #include "ipfs/commands/argument.h"
-#include "ipfs/commands/request.h"
+//#include "ipfs/commands/request.h"
 #include "command_option.h"
+
+// forward declaration
+struct Request;
 
 struct HelpText {
 	char* tagline;
@@ -42,7 +45,7 @@ struct Command {
 };
 
 // construction/destruction
-int init_command(struct Command* cmd);
-int uninit_command(struct Command* cmd);
+int commands_command_init(struct Command* cmd);
+int commands_command_free(struct Command* cmd);
 
 #endif // command.h

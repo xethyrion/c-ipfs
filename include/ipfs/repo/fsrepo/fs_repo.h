@@ -42,5 +42,13 @@ int fs_repo_is_initialized(char* repo_path);
  */
 int fs_repo_write_config_file(char* path, struct RepoConfig* config);
 
+/**
+ * Initializes a new FSRepo at the given path with the provided config
+ * @param repo_path the path to use
+ * @param config the information for the config file
+ * @returns true(1) on success
+ */
+int fs_repo_init(char* repo_path, struct RepoConfig* config);
+
 
 #endif /* fs_repo_h */

@@ -14,6 +14,7 @@ int testit(const char* name, int (*func)(void)) {
 }
 
 int main(int argc, char** argv) {
+	testit("test_init_new_installation", test_init_new_installation);
 	testit("test_repo_config_init", test_repo_config_init);
 	testit("test_repo_config_write", test_repo_config_write);
 	testit("test_repo_config_identity_new", test_repo_config_identity_new);
