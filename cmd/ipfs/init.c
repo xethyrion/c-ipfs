@@ -22,6 +22,11 @@ int init_pre_run(struct Request* request) {
 	return 1;
 }
 
+/**
+ * This actually opens the repo and gets things set up
+ * @param repo_root the root of the repository
+ * @returns true(1) on success
+ */
 int initialize_ipns_keyspace(char* repo_root) {
 	//TODO: open fs repo
 	struct FSRepo repo;
@@ -33,7 +38,7 @@ int initialize_ipns_keyspace(char* repo_root) {
 	struct Context* ctx;
 	struct BuildCfg* bld_cfg;
 	//TODO: see line 185 of init.go, what does core.BldCfg{Repo: r} do? BldCfg is a structure
-	retVal = core_builder_new_node(ctx, bld_cfg, ipfs_node);
+	retVal = ipfs_core_builder_new_node(ctx, bld_cfg, ipfs_node);
 	//return namesys_initialize_keyspace(ctx, ipfs_node->DAG, ipfs_node->Namesys, ipfs_node->pinning, ipfs_node->private_key);
 	return retVal;
 }

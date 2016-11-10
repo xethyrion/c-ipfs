@@ -24,6 +24,6 @@ struct BuildCfg {
 	//struct Repo repo;
 };
 
-int core_builder_new_node(struct Context* context, struct BuildCfg* build_cfg, struct IpfsNode* buildConfig);
+int ipfs_core_builder_new_node(struct Context* context, struct BuildCfg* build_cfg, struct IpfsNode* buildConfig);
 
 #endif /* builder_h */
