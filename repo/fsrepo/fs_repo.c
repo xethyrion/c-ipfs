@@ -30,9 +30,9 @@ int repo_config_write_config_file(char* full_filename, struct RepoConfig* config
 	fprintf(out_file, "  \"PeerID\": \"%s\",\n", config->identity.peer_id);
 	// TODO: print correct format of private key
 	// first base 64 it
-	size_t encoded_size = base64_encode_length(config->identity.private_key.der, config->identity.private_key.der_length);
+	size_t encoded_size = libp2p_crypto_encoding_base64_encode_size(config->identity.private_key.der_length);
 	unsigned char encoded_buffer[encoded_size + 1];
-	int retVal = base64_encode(config->identity.private_key.der, config->identity.private_key.der_length, encoded_buffer, encoded_size, &encoded_size);
+	int retVal = libp2p_crypto_encoding_base64_encode(config->identity.private_key.der, config->identity.private_key.der_length, encoded_buffer, encoded_size, &encoded_size);
 	if (retVal == 0)
 		return 0;
 	encoded_buffer[encoded_size] = 0;

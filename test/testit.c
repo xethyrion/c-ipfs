@@ -2,6 +2,7 @@
 #include "repo/test_repo_identity.h"
 #include "repo/test_repo_bootstrap_peers.h"
 #include "cmd/ipfs/test_init.h"
+#include "cid/test_cid.h"
 
 int testit(const char* name, int (*func)(void)) {
 	printf("Testing %s...\n", name);
@@ -14,6 +15,9 @@ int testit(const char* name, int (*func)(void)) {
 }
 
 int main(int argc, char** argv) {
+	testit("test_cid_new_free", test_cid_new_free);
+	testit("test_cid_cast_multihash", test_cid_cast_multihash);
+	testit("test_cid_cast_non_multihash", test_cid_cast_non_multihash);
 	testit("test_init_new_installation", test_init_new_installation);
 	testit("test_repo_config_init", test_repo_config_init);
 	testit("test_repo_config_write", test_repo_config_write);

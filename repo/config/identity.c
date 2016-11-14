@@ -23,7 +23,7 @@ int repo_config_identity_new(struct Identity* identity, unsigned long num_bits_f
 	if (num_bits_for_keypair < 1024)
 		return 0;
 	// generate the private key (& public)
-	if (!crypto_rsa_generate_keypair( &(identity->private_key), num_bits_for_keypair))
+	if (!libp2p_crypto_rsa_generate_keypair( &(identity->private_key), num_bits_for_keypair))
 		return 0;
 	
 	// now the private key (in DER format) is in identity->private_key->der;
