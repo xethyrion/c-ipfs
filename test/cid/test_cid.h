@@ -70,10 +70,39 @@ int test_cid_cast_multihash() {
 }
 
 int test_cid_cast_non_multihash() {
-	// this should turn a multibase encoded string into a cid struct
-	// first, build a multibase encoded string
+	// first, build a hash
+	char* string_to_hash = "Hello, World!";
+	unsigned char hashed[32];
+	memset(hashed, 0, 32);
+	// hash the string
+	libp2p_crypto_hashing_sha256(string_to_hash, strlen(string_to_hash), hashed);
+
+	// now make it a hash with a version and codec embedded in varints before the hash
+	size_t array_size = 34; // 32 for the hash, 2 for the 2 varints
+	unsigned char array[array_size];
+	memset(array, 0, array_size);
+	// first the version
+	array[0] = 0;
+	// then the codec
+	array[1] = CID_PROTOBUF;
+	// then the hash
+	memcpy(&array[2], hashed, 32);
+
 	// now call cast
+	struct Cid cid;
+	int retVal = cid_cast(array, array_size, &cid);
+	if (retVal == 0)
+		return 0;
 	// check results
-	return 0;
+	if (cid.version != 0)
+		return 0;
+	if (cid.hash_length != 32)
+		return 0;
+	if (cid.codec != CID_PROTOBUF)
+		return 0;
+	if (strncmp(hashed, cid.hash, 32) != 0)
+		return 0;
+
+	return 1;
 }
 

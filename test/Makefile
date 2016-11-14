@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -O0 -I../include -I../../c-libp2p/include -I../../c-multihash/include -g3
-LFLAGS = -L../../c-libp2p -L../../c-multihash -lp2p -lm -lmultihash
+CFLAGS = -O0 -I../include -I../../c-libp2p/include -I../../c-multihash/include -I../../c-multiaddr/ -g3
+LFLAGS = -L../../c-libp2p -L../../c-multihash -L../../c-multiaddr -lp2p -lm -lmultihash -lmultiaddr
 DEPS = cmd/ipfs/test_init.h repo/test_repo_bootstrap_peers.h repo/test_repo_config.h repo/test_repo_identity.h cid/test_cid.h
 OBJS = testit.o ../cmd/ipfs/init.o ../commands/argument.o ../commands/command_option.o \
 	../commands/command.o ../commands/cli/parse.o ../core/builder.o ../repo/fsrepo/fs_repo.o \

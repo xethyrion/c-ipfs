@@ -11,6 +11,7 @@
 #include "libp2p/crypto/encoding/base58.h"
 #include "ipfs/multibase/multibase.h"
 #include "mh/multihash.h"
+#include "multiaddr/varint.h"
 
 
 /**
@@ -104,34 +105,29 @@ int cid_cast(unsigned char* incoming, size_t incoming_size, struct Cid* cid) {
 		cid->hash_length = mh_multihash_length(incoming, incoming_size);
 		cid->codec = CID_PROTOBUF;
 		cid->version = 0;
-		// allocate memory for hash
-		cid->hash = malloc(cid->hash_length);
-		if (cid->hash == NULL)
-			return 0;
 
 		mh_multihash_digest(incoming, incoming_size, &cid->hash, &cid->hash_length);
 		return 1;
 	}
 
-	/*
-	 *TODO: Implement this
-	// This is not a multihash. Try to peel the information out of the bytes
+	// This is not a multihash. Perhaps it is using varints. Try to peel the information out of the bytes.
 	// first the version
 	int pos = 0, retVal = 0;
-	int num_bytes = 0;
-	retVal = varint_to_int(&incoming[pos], &cid->version, &num_bytes);
-	if (retVal == 0)
+	size_t num_bytes = 0;
+	num_bytes = uvarint_decode32(&incoming[pos], incoming_size - pos, &cid->version);
+	if (num_bytes < 0 || cid->version > 1 || cid->version < 0)
 		return 0;
 	pos = num_bytes;
 	// now the codec
-	retVal = varint_to_int(&incoming[pos], &cid->codec, &num_bytes);
-	if (retVal == 0)
+	uint32_t codec = 0;
+	num_bytes = uvarint_decode32(&incoming[pos], incoming_size - pos, &codec);
+	if (num_bytes < 0)
 		return 0;
+	cid->codec = codec;
 	pos += num_bytes;
 	// now what is left
 	cid->hash_length = incoming_size - pos;
-	// TODO: allocate memory
-	memcpy(cid->hash, &incoming[pos], cid->hash_length);
-	*/
-	return 0;
+	cid->hash = &incoming[pos];
+
+	return 1;
 }
