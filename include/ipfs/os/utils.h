@@ -13,7 +13,7 @@
  * @param variable the variable to look for
  * @returns the results
  */
-char* os_utils_getenv(char* variable);
+char* os_utils_getenv(const char* variable);
 
 /**
  * get the user's home directory
@@ -28,10 +28,12 @@ char* os_utils_get_homedir();
  * @param results where to put the results
  * @param max_len throw an error if the total is longer than max_len
  */
-int os_utils_filepath_join(char* root, char* extension, char* results, unsigned long max_len);
+int os_utils_filepath_join(const char* root, const char* extension, char* results, unsigned long max_len);
 
-int os_utils_file_exists(char* file_name);
+int os_utils_file_exists(const char* file_name);
 
-int os_utils_directory_writeable(char* path);
+int os_utils_file_size(const char* file_name);
+
+int os_utils_directory_writeable(const char* path);
 
 #endif /* utils_h */

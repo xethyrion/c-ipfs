@@ -8,8 +8,12 @@
 
 #include "libp2p/crypto/encoding/base64.h"
 
+#include "ipfs/repo/config/datastore.h"
 #include "ipfs/repo/fsrepo/fs_repo.h"
 #include "ipfs/os/utils.h"
+#include "ipfs/repo/fsrepo/lmdb_datastore.h"
+#include "jsmn.h"
+
 /** 
  * private methods
  */
@@ -28,7 +32,7 @@ int repo_config_write_config_file(char* full_filename, struct RepoConfig* config
 	fprintf(out_file, "{\n");
 	fprintf(out_file, " \"Identity\": {\n");
 	fprintf(out_file, "  \"PeerID\": \"%s\",\n", config->identity.peer_id);
-	// TODO: print correct format of private key
+	// print correct format of private key
 	// first base 64 it
 	size_t encoded_size = libp2p_crypto_encoding_base64_encode_size(config->identity.private_key.der_length);
 	unsigned char encoded_buffer[encoded_size + 1];
@@ -60,7 +64,7 @@ int repo_config_write_config_file(char* full_filename, struct RepoConfig* config
 	fprintf(out_file, "  ],\n");
 	fprintf(out_file, "  \"API\": \"%s\",\n", config->addresses.api);
 	fprintf(out_file, "  \"Gateway\": \"%s\"\n", config->addresses.gateway);
-	fprintf(out_file, " }\n  \"Mounts\": {\n");
+	fprintf(out_file, " },\n  \"Mounts\": {\n");
 	fprintf(out_file, "  \"IPFS\": \"%s\",\n", config->mounts.ipfs);
 	fprintf(out_file, "  \"IPNS\": \"%s\",\n", config->mounts.ipns);
 	fprintf(out_file, "  \"FuseAllowOther\": %s\n", "false");
@@ -87,7 +91,7 @@ int repo_config_write_config_file(char* full_filename, struct RepoConfig* config
 		if (i < config->gateway.http_headers.num_elements - 1)
 			fprintf(out_file, ",\n");
 		else
-			fprintf(out_file, "\n");
+			fprintf(out_file, "\n },\n");
 	}
 	fprintf(out_file, "  \"RootRedirect\": \"%s\"\n", config->gateway.root_redirect);
 	fprintf(out_file, "  \"Writable\": %s\n", config->gateway.writable ? "true" : "false");
@@ -101,13 +105,16 @@ int repo_config_write_config_file(char* full_filename, struct RepoConfig* config
 }
 
 /**
- * constructs the FSRepo struct. Basically fills in the FSRepo.path
- * Remember: the path must be freed
+ * constructs the FSRepo struct.
+ * Remember: ipfs_repo_fsrepo_free must be called
  * @param repo_path the path to the repo
+ * @param config the optional config file. NOTE: if passed, fsrepo_free will free resources of the RepoConfig.
  * @param repo the struct to fill in
  * @returns false(0) if something bad happened, otherwise true(1)
  */
-int fs_repo_new_fs_repo(char* repo_path, struct FSRepo* repo) {
+int ipfs_repo_fsrepo_new(char* repo_path, struct RepoConfig* config, struct FSRepo** repo) {
+	*repo = (struct FSRepo*)malloc(sizeof(struct FSRepo));
+
 	if (repo_path == NULL) {
 		// get the user's home directory
 		char* home_dir = os_utils_get_homedir();
@@ -115,11 +122,25 @@ int fs_repo_new_fs_repo(char* repo_path, struct FSRepo* repo) {
 		unsigned long newPathLen = strlen(home_dir) + strlen(default_subdir) + 2;  // 1 for slash and 1 for end
 		char* newPath = malloc(sizeof(char) * newPathLen);
 		os_utils_filepath_join(os_utils_get_homedir(), default_subdir, newPath, newPathLen);
-		repo->path = newPath;
+		(*repo)->path = newPath;
 	} else {
 		int len = strlen(repo_path) + 1;
-		repo->path = (char*)malloc(len);
-		strncpy(repo->path, repo_path, len);
+		(*repo)->path = (char*)malloc(len);
+		strncpy((*repo)->path, repo_path, len);
+	}
+	// allocate other structures
+	if (config != NULL)
+		(*repo)->config = config;
+	else {
+		if (ipfs_repo_config_new(&((*repo)->config)) == 0) {
+			free(repo_path);
+			return 0;
+		}
+	}
+	if (ipfs_repo_config_datastore_new(&((*repo)->data_store)) == 0) {
+		free(repo_path);
+		ipfs_repo_config_free((*repo)->config);
+		return 0;
 	}
 	return 1;
 }
@@ -129,8 +150,13 @@ int fs_repo_new_fs_repo(char* repo_path, struct FSRepo* repo) {
  * @param repo the struct to clean up
  * @returns true(1) on success
  */
-int fs_repo_free(struct FSRepo* repo) {
-	free(repo->path);
+int ipfs_repo_fsrepo_free(struct FSRepo* repo) {
+	if (repo != NULL) {
+		free(repo->path);
+		ipfs_repo_config_free(repo->config);
+		ipfs_repo_config_datastore_free(repo->data_store);
+		free(repo);
+	}
 	return 1;
 }
 
@@ -175,14 +201,189 @@ int repo_check_initialized(char* full_path) {
 }
 
 /***
- * opens the datastore and puts it in the FSRepo struct
+ * Reads the file, placing its contents in buffer
+ * NOTE: this allocates memory for buffer, and should be freed
+ * @param path the path to the config file
+ * @param buffer where to put the contents
+ * @returns true(1) on success
+ */
+int _read_file(const char* path, char** buffer) {
+	int file_size = os_utils_file_size(path);
+	if (file_size <= 0)
+		return 0;
+	// allocate memory
+	*buffer = malloc(file_size + 1);
+	if (*buffer == NULL) {
+		return 0;
+	}
+	memset(*buffer, 0, file_size + 1);
+
+	// open file
+	FILE* in_file = fopen(path, "r");
+	// read data
+	fread(*buffer, file_size, 1, in_file);
+
+	// cleanup
+	fclose(in_file);
+	return 1;
+}
+
+/**
+ * Find the position of a key
+ * @param data the string that contains the json
+ * @param tokens the tokens of the parsed string
+ * @param tok_length the number of tokens there are
+ * @param tag what we're looking for
+ * @returns the position of the requested token in the array, or -1
+ */
+int _find_token(const char* data, const jsmntok_t* tokens, int tok_length, int start_from, const char* tag) {
+	for(int i = start_from; i < tok_length; i++) {
+		jsmntok_t curr_token = tokens[i];
+		if ( curr_token.type == JSMN_STRING) {
+			// convert to string
+			int str_len = curr_token.end - curr_token.start;
+			char str[str_len + 1];
+			strncpy(str, &data[curr_token.start], str_len );
+			str[str_len] = 0;
+			if (strcmp(str, tag) == 0)
+				return i;
+		}
+	}
+	return -1;
+}
+
+/**
+ * Retrieves the value of a key / value pair from the JSON data
+ * @param data the full JSON string
+ * @param tokens the array of tokens
+ * @param tok_length the number of tokens
+ * @param search_from start search from this token onward
+ * @param tag what to search for
+ * @param result where to put the result. NOTE: allocates memory that must be freed
+ * @returns true(1) on success
+ */
+int _get_json_string_value(char* data, const jsmntok_t* tokens, int tok_length, int search_from, const char* tag, char** result) {
+	int pos = _find_token(data, tokens, tok_length, search_from, tag);
+	if (pos < 0)
+		return 0;
+	jsmntok_t curr_token = tokens[pos+1];
+	if (curr_token.type == JSMN_PRIMITIVE) {
+		// a null
+		*result = NULL;
+	}
+	if (curr_token.type != JSMN_STRING)
+		return 0;
+	// allocate memory
+	int str_len = curr_token.end - curr_token.start;
+	*result = malloc(sizeof(char) * str_len + 1);
+	// copy in the string
+	strncpy(*result, &data[curr_token.start], str_len);
+	(*result)[str_len] = 0;
+	return 1;
+}
+
+/**
+ * Retrieves the value of a key / value pair from the JSON data
+ * @param data the full JSON string
+ * @param tokens the array of tokens
+ * @param tok_length the number of tokens
+ * @param search_from start search from this token onward
+ * @param tag what to search for
+ * @param result where to put the result
+ * @returns true(1) on success
+ */
+int _get_json_int_value(char* data, const jsmntok_t* tokens, int tok_length, int search_from, const char* tag, int* result) {
+	int pos = _find_token(data, tokens, tok_length, search_from, tag);
+	if (pos < 0)
+		return 0;
+	jsmntok_t curr_token = tokens[pos+1];
+	if (curr_token.type != JSMN_PRIMITIVE)
+		return 0;
+	// allocate memory
+	int str_len = curr_token.end - curr_token.start;
+	char str[str_len + 1];
+	// copy in the string
+	strncpy(str, &data[curr_token.start], str_len);
+	str[str_len] = 0;
+	if (strcmp(str, "true") == 0)
+		*result = 1;
+	else if (strcmp(str, "false") == 0)
+		*result = 0;
+	else if (strcmp(str, "null") == 0) // what should we do here?
+		*result = 0;
+	else // its a real number
+		*result = atoi(str);
+	return 1;
+}
+
+/***
+ * Opens the config file and puts the data into the FSRepo struct
  * @param repo the FSRepo struct
  * @returns 0 on failure, otherwise 1
  */
 int fs_repo_open_config(struct FSRepo* repo) {
-	//TODO: open config file
-	//TODO: read into the FSRepo struct
+	int retVal;
+	char* data;
+	size_t full_filename_length = strlen(repo->path) + 8;
+	char full_filename[full_filename_length];
+	retVal = os_utils_filepath_join(repo->path, "config", full_filename, full_filename_length);
+	if (retVal == 0)
+		return 0;
+	retVal = _read_file(full_filename, &data);
+	// parse the data
+	jsmn_parser parser;
+	jsmn_init(&parser);
+	int num_tokens = 256;
+	jsmntok_t tokens[num_tokens];
+	num_tokens = jsmn_parse(&parser, data, strlen(data), tokens, 256);
+	if (num_tokens <= 0) {
+		free(data);
+		return 0;
+	}
+	// fill FSRepo struct
+	repo->config = malloc(sizeof(struct RepoConfig));
+	// Identity
+	int curr_pos = _find_token(data, tokens, num_tokens, 0, "Identity");
+	if (curr_pos < 0) {
+		free(data);
+		return 0;
+	}
+	// the next should be the array, then string "PeerID"
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "PeerID", &repo->config->identity.peer_id);
+	char* priv_key_base64;
+	// then PrivKey
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "PrivKey", &priv_key_base64);
+	retVal = repo_config_identity_build_private_key(&repo->config->identity, priv_key_base64);
+	if (retVal == 0) {
+		free(data);
+		free(priv_key_base64);
+		return 0;
+	}
+	// now the datastore
+	int datastore_position = _find_token(data, tokens, num_tokens, 0, "Datastore");
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "Type", &repo->config->datastore.type);
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "Path", &repo->config->datastore.path);
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "StorageMax", &repo->config->datastore.storage_max);
+	_get_json_int_value(data, tokens, num_tokens, curr_pos, "StorageGCWatermark", &repo->config->datastore.storage_gc_watermark);
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "GCPeriod", &repo->config->datastore.gc_period);
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "Params", &repo->config->datastore.params);
+	_get_json_int_value(data, tokens, num_tokens, curr_pos, "NoSync", &repo->config->datastore.no_sync);
+	_get_json_int_value(data, tokens, num_tokens, curr_pos, "HashOnRead", &repo->config->datastore.hash_on_read);
+	_get_json_int_value(data, tokens, num_tokens, curr_pos, "BloomFilterSize", &repo->config->datastore.bloom_filter_size);
+
+	// free the memory used reading the json file
+	free(data);
+	free(priv_key_base64);
 	return 1;
+}
+
+/***
+ * set function pointers in the datastore struct to lmdb
+ * @param repo contains the information
+ * @returns true(1) on success
+ */
+int fs_repo_setup_lmdb_datastore(struct FSRepo* repo) {
+	return repo_fsrepo_lmdb_cast(repo->data_store);
 }
 
 /***
@@ -191,8 +392,27 @@ int fs_repo_open_config(struct FSRepo* repo) {
  * @returns 0 on failure, otherwise 1
  */
 int fs_repo_open_datastore(struct FSRepo* repo) {
-	//TODO: this
-	return 1;
+	int argc = 0;
+	char** argv = NULL;
+
+	// copy struct from config area to this area
+	repo->data_store = &repo->config->datastore;
+
+	if (strncmp(repo->data_store->type, "lmdb", 4) == 0) {
+		// this is a LightningDB. Open it.
+		int retVal = fs_repo_setup_lmdb_datastore(repo);
+		if (retVal == 0)
+			return 0;
+	} else {
+		// add new datastore types here
+		return 0;
+	}
+
+	int retVal = repo->data_store->datastore_open(argc, argv, repo->data_store);
+
+	// do specific datastore cleanup here if needed
+
+	return retVal;
 }
 
 /**
@@ -201,22 +421,13 @@ int fs_repo_open_datastore(struct FSRepo* repo) {
 
 /**
  * opens a fsrepo
- * @param repo_path the path to the repo
- * @param repo where to store the repo info
+ * @param repo the repo struct. Should contain the path. This method will do the rest
  * @return 0 if there was a problem, otherwise 1
  */
-int fs_repo_open(char* repo_path, struct FSRepo* repo) {
+int ipfs_repo_fsrepo_open(struct FSRepo* repo) {
 	//TODO: lock
-	// get the path set in the repo struct
-	int retVal = fs_repo_new_fs_repo(repo_path, repo);
-	if (retVal == 0) {
-		fs_repo_free(repo);
-		return 0;
-	}
-	
 	// check if initialized
 	if (!repo_check_initialized(repo->path)) {
-		fs_repo_free(repo);
 		return 0;
 	}
 	//TODO: lock the file (remember to unlock)
@@ -224,12 +435,11 @@ int fs_repo_open(char* repo_path, struct FSRepo* repo) {
 	//TODO: make sure the directory is writable
 	//TODO: open the config
 	if (!fs_repo_open_config(repo)) {
-		fs_repo_free(repo);
 		return 0;
 	}
-	//TODO: open the datastore. Note: the config file has the datastore type
+
+	// open the datastore
 	if (!fs_repo_open_datastore(repo)) {
-		fs_repo_free(repo);
 		return 0;
 	}
 	
@@ -253,14 +463,14 @@ int fs_repo_is_initialized(char* repo_path) {
  * @param config the information for the config file
  * @returns true(1) on success
  */
-int fs_repo_init(char* path, struct RepoConfig* config) {
+int ipfs_repo_fsrepo_init(struct FSRepo* repo) {
 	// TODO: Do a lock so 2 don't do this at the same time
 	
 	// return error if this has already been done
-	if (fs_repo_is_initialized_unsynced(path))
+	if (fs_repo_is_initialized_unsynced(repo->path))
 		return 0;
 	
-	int retVal = fs_repo_write_config_file(path, config);
+	int retVal = fs_repo_write_config_file(repo->path, repo->config);
 	if (retVal == 0)
 		return 0;
 	

@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O0 -I../../include -I../../../c-libp2p/include
+CFLAGS = -O0 -I../../include -I../../../c-libp2p/include -I../../../c-multihash/include
 
 ifdef DEBUG
 CFLAGS += -g3

@@ -6,7 +6,7 @@
 #include "ipfs/cid/cid.h"
 #include "ipfs/multibase/multibase.h"
 
-#include "libp2p/crypto/hashing/sha256.h"
+#include "libp2p/crypto/sha256.h"
 
 int test_cid_new_free() {
 
