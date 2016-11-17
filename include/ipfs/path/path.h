@@ -1,0 +1,33 @@
+#ifndef IPFS_PATH_H
+   #define IPFS_PATH_H
+
+   char *ErrPath[] = {
+       NULL,
+       // ErrBadPath is returned when a given path is incorrectly formatted
+       "invalid 'ipfs ref' path",
+       // Paths after a protocol must contain at least one component
+       "path must contain at least one component",
+       "TODO: ErrCidDecode",
+       NULL,
+       "no link named %s under %s"
+   };
+
+   enum {
+       ErrBadPath = 1,
+       ErrNoComponents,
+       ErrCidDecode,
+       ErrNoLink,
+       ErrNoLinkFmt
+   } PathErrs;
+
+   char* PathFromCid (char *c);
+   char** Segments (char *p);
+   int SegmentsLength (char **s);
+   void FreeSegments (char ***s);
+   int IsJustAKey (char *p);
+   int PopLastSegment (char *p, char **str);
+   char *PathFromSegments(char *prefix, char **seg);
+   int ParseCidToPath (char *dst, char *txt);
+   int ParsePath (char *dst, char *txt);
+   int PathIsValid (char *p);
+#endif // IPFS_PATH_H
