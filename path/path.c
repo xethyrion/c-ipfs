@@ -6,11 +6,12 @@
 // FromCid safely converts a cid.Cid type to a Path type
 char* PathFromCid (struct Cid *c)
 {
+   const char prefix[] = "/ipfs/";
    char *rpath, *cidstr = CidString(c);
 
-   rpath = malloc(strlen(cidstr) + 7);
+   rpath = malloc(sizeof(prefix) + strlen(cidstr));
    if (!rpath) return NULL;
-   strcpy(rpath, "/ipfs/");
+   strcpy(rpath, prefix);
    strcat(rpath, cidstr);
    return rpath;
 }
@@ -31,7 +32,7 @@ char** Segments (char *p)
    rbuf = malloc(strlen(p) + 1);
    if (!rbuf) return NULL;
 
-   rsegs = malloc(sizeof(char*) * (slash_count + 2)); // slashs splits plus NULL pointer termination
+   rsegs = calloc(sizeof(char*), slash_count + 2); // slashs splits plus NULL pointer termination
    if (!rsegs) {
       free(rbuf);
       return NULL;
@@ -48,8 +49,9 @@ int SegmentsLength (char **s)
 {
    int r = 0;
 
-   if (!s) return 0;
-   while (s[r]) r++;
+   if (s) {
+      while (s[r]) r++;
+   }
 
    return r;
 }
@@ -84,7 +86,7 @@ int PopLastSegment (char *p, char **str)
 {
    if (IsJustAKey(p)) return 0;
    *str = strrchr(p, '/');
-   if (!*str) return -1; // error
+   if (!*str) return ErrBadPath; // error
    **str = '\0';
    *str++;
    return 0;
@@ -115,7 +117,8 @@ char *PathFromSegments(char *prefix, char **seg)
 
 int ParseCidToPath (char *dst, char *txt)
 {
-   char *c, *r;
+   struct Cid *c;
+   char *r;
 
    if (!txt || txt[0] == '\0') return ErrNoComponents;
 
@@ -126,7 +129,6 @@ int ParseCidToPath (char *dst, char *txt)
    }
 
    r = PathFromCid(c);
-   free(c);
 
    if (!r) {
       return ErrCidDecode;
@@ -140,6 +142,8 @@ int ParsePath (char *dst, char *txt)
 {
    int err, i;
    char *c;
+   const char prefix[] = "/ipfs/";
+   const int plen = strlen(prefix);
 
    if (!txt || txt[0] == '\0') return ErrNoComponents;
 
@@ -147,9 +151,9 @@ int ParsePath (char *dst, char *txt)
       if (*txt == '/') {
          txt++;
       }
-      err = ParseCidToPath (dst+6, txt);
-      if (err == 0) {
-         memcpy (dst, "/ipfs/", 6);
+      err = ParseCidToPath (dst+plen, txt);
+      if (err == 0) { // only change dst if ParseCidToPath returned success.
+         memcpy (dst, prefix, plen); // use memcpy to don't copy null terminator.
          return 0;
       }
       return err;
@@ -159,7 +163,7 @@ int ParsePath (char *dst, char *txt)
    for (i = 0 ; (c = strchr(c, '/')) ; i++) c++;
    if (i < 3) return ErrBadPath;
 
-   if (strcmp (txt, "/ipfs/") == 0) {
+   if (strcmp (txt, prefix) == 0) {
       char buf[strlen(txt+5)];
       strcpy (buf, txt+6); // copy to temp buffer.
       c = strchr(buf, '/');
