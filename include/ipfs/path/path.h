@@ -20,7 +20,7 @@
        ErrNoLinkFmt
    } PathErrs;
 
-   char* PathFromCid (char *c);
+   char* PathFromCid (struct Cid *c);
    char** Segments (char *p);
    int SegmentsLength (char **s);
    void FreeSegments (char ***s);

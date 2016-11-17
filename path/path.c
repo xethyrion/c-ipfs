@@ -1,16 +1,17 @@
 #include <string.h>
 #include <stdlib.h>
+#include <ipfs/cid/cid.h>
 #include <ipfs/path/path.h>
 
 // FromCid safely converts a cid.Cid type to a Path type
-char* PathFromCid (char *c)
+char* PathFromCid (struct Cid *c)
 {
-   char *rpath;
+   char *rpath, *cidstr = CidString(c);
 
-   rpath = malloc(strlen(c) + 7);
+   rpath = malloc(strlen(cidstr) + 7);
    if (!rpath) return NULL;
    strcpy(rpath, "/ipfs/");
-   strcat(rpath, c);
+   strcat(rpath, cidstr);
    return rpath;
 }
 
