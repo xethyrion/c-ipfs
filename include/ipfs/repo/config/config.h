@@ -75,10 +75,17 @@ int config_path(char* config_root, char* extension, char* result, int max_len);
 int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair, char* repo_path);
 
 /***
+ * Initialize memory for a RepoConfig struct
+ * @param config the structure to initialize
+ * @returns true(1) on success
+ */
+int ipfs_repo_config_new(struct RepoConfig** config);
+
+/***
  * free all resources that were allocated to store config information
  * @param config the config
  * @returns true(1)
  */
-int repo_config_free(struct RepoConfig* config);
+int ipfs_repo_config_free(struct RepoConfig* config);
 
 #endif

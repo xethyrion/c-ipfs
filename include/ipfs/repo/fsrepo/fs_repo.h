@@ -15,7 +15,7 @@ struct FSRepo {
 	int closed;
 	char* path;
 	struct IOCloser* lock_file;
-	struct Config* config;
+	struct RepoConfig* config;
 	struct Datastore* data_store;
 };
 
@@ -25,7 +25,7 @@ struct FSRepo {
  * @param repo where to store the repo info
  * @return 0 if there was a problem, otherwise 1
  */
-int fs_repo_open(char* repo_path, struct FSRepo* repo);
+int ipfs_repo_fsrepo_open(struct FSRepo* repo);
 
 /***
  * checks to see if the repo is initialized
@@ -48,7 +48,20 @@ int fs_repo_write_config_file(char* path, struct RepoConfig* config);
  * @param config the information for the config file
  * @returns true(1) on success
  */
-int fs_repo_init(char* repo_path, struct RepoConfig* config);
+int ipfs_repo_fsrepo_new(char* repo_path, struct RepoConfig* config, struct FSRepo** fs_repo);
 
+/***
+ * Free all resources used by this struct
+ * @param repo the repo to clean up
+ * @returns true(1) on success
+ */
+int ipfs_repo_fsrepo_free(struct FSRepo* config);
+
+/***
+ * Initialize a new repo with the specified configuration
+ * @param config the information in order to build the repo
+ * @returns true(1) on success
+ */
+int ipfs_repo_fsrepo_init(struct FSRepo* config);
 
 #endif /* fs_repo_h */

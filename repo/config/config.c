@@ -78,7 +78,7 @@ int repo_config_get_file_name(char* path, char** result) {
 	if (result == NULL)
 		return 0;
 	
-	return os_utils_filepath_join(path, "/config", *result, max_len);
+	return os_utils_filepath_join(path, "config", *result, max_len);
 }
 
 /***
@@ -88,9 +88,8 @@ int repo_config_get_file_name(char* path, char** result) {
  * @returns true(1) on success, otherwise 0
  */
 int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair, char* repo_path) {
-	
 	// identity
-	int retVal = repo_config_identity_new(&(config->identity), num_bits_for_keypair);
+	int retVal = repo_config_identity_init(&(config->identity), num_bits_for_keypair);
 	if (retVal == 0)
 		return 0;
 	
@@ -100,7 +99,7 @@ int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypai
 		return 0;
 	
 	// datastore
-	retVal = repo_config_datastore_init(&(config->datastore), repo_path);
+	retVal = ipfs_repo_config_datastore_init(&(config->datastore), repo_path);
 	if (retVal == 0)
 		return 0;
 
@@ -139,10 +138,30 @@ int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypai
 	return 1;
 }
 
-int repo_config_free(struct RepoConfig* config) {
-	repo_config_bootstrap_peers_free(&(config->peer_addresses));
-	repo_config_datastore_free(&(config->datastore));
-	repo_config_addresses_free(&(config->addresses));
+/***
+ * Initialize memory for a RepoConfig struct
+ * @param config the structure to initialize
+ * @returns true(1) on success
+ */
+int ipfs_repo_config_new(struct RepoConfig** config) {
+	*config = (struct RepoConfig*)malloc(sizeof(struct RepoConfig));
+	if (*config == NULL)
+		return 0;
+	return 1;
+}
+
+/**
+ * Free resources
+ * @param config the struct to be freed
+ * @returns true(1) on success
+ */
+int ipfs_repo_config_free(struct RepoConfig* config) {
+	if (config != NULL) {
+		repo_config_bootstrap_peers_free(&(config->peer_addresses));
+		//ipfs_repo_config_datastore_free(&(config->datastore));
+		repo_config_addresses_free(&(config->addresses));
+		free(config);
+	}
 	return 1;
 }
 

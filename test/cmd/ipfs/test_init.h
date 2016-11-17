@@ -13,6 +13,7 @@
 //#include <string.h>
 
 int test_init_new_installation() {
+	unlink("/tmp/.ipfs/config");
 	// do the minimum to get the .ipfs directory structure and config file built
 	struct Request request;
 	int retVal = ipfs_cmd_ipfs_init_command_new( &request.cmd );

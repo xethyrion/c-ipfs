@@ -24,14 +24,14 @@ int init_pre_run(struct Request* request) {
 
 /**
  * This actually opens the repo and gets things set up
- * @param repo_root the root of the repository
+ * @param repo the repo information
  * @returns true(1) on success
  */
-int initialize_ipns_keyspace(char* repo_root) {
-	//TODO: open fs repo
-	struct FSRepo repo;
-	// get the path
-	int retVal = fs_repo_open(repo_root, &repo);
+int initialize_ipns_keyspace(struct FSRepo* repo) {
+	//open fs repo
+	int retVal = ipfs_repo_fsrepo_open(repo);
+	if (retVal == 0)
+		return 0;
 	//TODO: make a new node, then close it
 	//TODO: setup offline routing on new node
 	struct IpfsNode* ipfs_node;
@@ -66,11 +66,16 @@ int do_init(FILE* out_file, char* repo_root, int empty, int num_bits_for_keypair
 			return 0;
 	}
 	// initialize the fs repo
-	int retVal = fs_repo_init(repo_root, conf);
+	struct FSRepo* repo;
+	int retVal = ipfs_repo_fsrepo_new(repo_root, conf, &repo);
 	if (retVal == 0)
 		return 0;
+	retVal = ipfs_repo_fsrepo_init(repo);
+	if (retVal == 0)
+		return 0;
+
 	//TODO: add default assets
-	return initialize_ipns_keyspace(repo_root);
+	return initialize_ipns_keyspace(repo);
 }
 
 /***
