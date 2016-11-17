@@ -5,7 +5,5 @@
 !**/
 
 *.o
-.cproject
-.project
 .settings/language.settings.xml
 test/test_ipfs
