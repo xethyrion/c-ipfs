@@ -56,4 +56,6 @@
     int resolveOnce (char **path, char *name);
     int Publish (char *proto, ciPrivKey name, char *value);
     int PublishWithEOL (char *proto, ciPrivKey name, char *value, time_t eol);
+
+    int ProquintResolveOnce (char **p, char *name);
 #endif //NAMESYS_H
