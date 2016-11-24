@@ -4,11 +4,6 @@
 #include "ipfs/path/path.h"
 #include "ipfs/namesys/namesys.h"
 
-typedef struct s_resolver {
-    // resolveOnce looks up a name once (without recursion).
-    int (*resolveOnce) (char **, char *);
-} resolver;
-
 int resolve (resolver *r, char **p, char *str, int depth, char **prefixes)
 {
     int err, i;

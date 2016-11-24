@@ -34,18 +34,31 @@ func NewNameSystem(r routing.ValueStore, ds ds.Datastore, cachesize int) NameSys
 const DefaultResolverCacheTTL = time.Minute;
 
 // Resolve implements Resolver.
-int Resolve(char *name)
+int Resolve(char **path, char *name)
 {
-    return ResolveN(name, DefaultDepthLimit);
+    return ResolveN(path, name, DefaultDepthLimit);
 }
 
 // ResolveN implements Resolver.
-int ResolveN(char *name, int depth)
+int ResolveN(char **path, char *name, int depth)
 {
     char ipfs_prefix[] = "/ipfs/";
+    char p[500];
+    char *ps[] = {"/ipns/", NULL};
+    int err;
+    resolver r;
+
+    r.resolveOnce = resolveOnce;
 
     if (memcmp(name, ipfs_prefix, strlen(ipfs_prefix)) == 0) {
-        return ParsePath(name);
+        ParsePath(p, name);
+        *path = malloc(strlen(p) + 1);
+        if (*p) {
+            strcpy(*path, p);
+        } else {
+            err = ErrAllocFailed;
+        }
+        return err;
     }
 
     if (*name == '/') {
@@ -55,13 +68,19 @@ int ResolveN(char *name, int depth)
             return ErrAllocFailed;
         }
         strcpy(str, ipfs_prefix);
-        strcat(str, name+1);  // ignore inital / from name, because ipfs_prefix already has it.
-        err = ParsePath(str); // save return value.
-        free (str);           // so we can free allocated memory before return.
+        strcat(str, name+1);     // ignore inital / from name, because ipfs_prefix already has it.
+        err = ParsePath(p, str); // save return value.
+        free (str);              // so we can free allocated memory before return.
+        *path = malloc(strlen(p) + 1);
+        if (*p) {
+            strcpy(*path, p);
+        } else {
+            err = ErrAllocFailed;
+        }
         return err;
     }
 
-    return resolve(ns, name, depth, "/ipns/");
+    return resolve(&r, path, name, depth, ps);
 }
 
 // resolveOnce implements resolver.
