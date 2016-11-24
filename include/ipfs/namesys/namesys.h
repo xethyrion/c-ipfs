@@ -54,6 +54,11 @@
         publishers *Publisher;
     } mpns;
 
+    typedef struct s_tlds {
+        char *str;
+        int  condition;
+    } tlds;
+
     int resolve (resolver *r, char **p, char *str, int depth, char **prefixes);
     int Resolve(char **path, char *name);
     int ResolveN(char **path, char *name, int depth);
@@ -62,4 +67,10 @@
     int PublishWithEOL (char *proto, ciPrivKey name, char *value, time_t eol);
 
     int ProquintResolveOnce (char **p, char *name);
+
+    int domainMatchString (char *d);
+    int IsICANNTLD(char *s);
+    int IsExtendedTLD (char *s);
+    int IsTLD (char *s);
+    int IsDomain (char *s);
 #endif //NAMESYS_H
