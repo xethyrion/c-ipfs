@@ -3,17 +3,21 @@
 
     #define DefaultDepthLimit 32
 
-    char *ErrNamesys[] = {
-        NULL,
-        "ErrAllocFailed",
-        "ErrNULLPointer",
-        "Could not publish name."
-        "Could not resolve name.",
-        "Could not resolve name (recursion limit exceeded).",
-        "expired record",
-        "unrecognized validity type",
-        "not a valid proquint string"
-    };
+    #ifdef NAMESYS_C
+        char *ErrNamesys[] = {
+            NULL,
+            "ErrAllocFailed",
+            "ErrNULLPointer",
+            "Could not publish name."
+            "Could not resolve name.",
+            "Could not resolve name (recursion limit exceeded).",
+            "expired record",
+            "unrecognized validity type",
+            "not a valid proquint string"
+        };
+    #else
+        extern char *ErrNamesys;
+    #endif // NAMESYS_C
 
     enum {
         ErrAllocFailed = 1,

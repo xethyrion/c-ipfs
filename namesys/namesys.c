@@ -3,6 +3,7 @@
 #include <time.h>
 #include "ipfs/cid/cid.h"
 #include "ipfs/path/path.h"
+#define NAMESYS_C
 #include "ipfs/namesys/namesys.h"
 
 /* mpns (a multi-protocol NameSystem) implements generic IPFS naming.
