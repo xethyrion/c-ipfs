@@ -82,7 +82,7 @@ int IsJustAKey (char *p)
 // PopLastSegment returns a new Path without its final segment, and the final
 // segment, separately. If there is no more to pop (the path is just a key),
 // the original path is returned.
-int PopLastSegment (char *p, char **str)
+int PopLastSegment (char **str, char *p)
 {
    if (IsJustAKey(p)) return 0;
    *str = strrchr(p, '/');

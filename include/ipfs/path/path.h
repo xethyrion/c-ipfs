@@ -25,7 +25,7 @@
    int SegmentsLength (char **s);
    void FreeSegments (char ***s);
    int IsJustAKey (char *p);
-   int PopLastSegment (char *p, char **str);
+   int PopLastSegment (char **str, char *p);
    char *PathFromSegments(char *prefix, char **seg);
    int ParseCidToPath (char *dst, char *txt);
    int ParsePath (char *dst, char *txt);
