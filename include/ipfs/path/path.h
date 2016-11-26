@@ -21,6 +21,7 @@
    } PathErrs;
 
    char* PathFromCid (struct Cid *c);
+   char** SplitN (char *p, char *delim, int n);
    char** Segments (char *p);
    int SegmentsLength (char **s);
    void FreeSegments (char ***s);

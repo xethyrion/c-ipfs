@@ -16,32 +16,56 @@ char* PathFromCid (struct Cid *c)
    return rpath;
 }
 
-char** Segments (char *p)
+char** SplitN (char *p, char *delim, int n)
 {
-   int slash_count, i;
-   char *c, **rsegs, *rbuf;
+   char *c, **r, *rbuf;
+   int i, dlen = strlen(delim);
 
-   if (*p == '/') p++; // Ignore leading slash
-
-   for (c = p , slash_count = 0 ; *c ; c++) {
-      if (*c == '/') slash_count++;
+   if (n == 0) {
+      return NULL; // no split?
    }
 
-   if (!slash_count) return NULL;
+   if (n < 0) { // negative, count all delimiters + 1.
+      for (c = p , n = 0 ; c ; n++) {
+         c = strstr(c, delim);
+         if (c) {
+            c += dlen;
+         }
+      }
+   } else {
+      n++; // increment param value.
+   }
 
    rbuf = malloc(strlen(p) + 1);
-   if (!rbuf) return NULL;
+   if (!rbuf) {
+      return NULL;
+   }
 
-   rsegs = calloc(sizeof(char*), slash_count + 2); // slashs splits plus NULL pointer termination
-   if (!rsegs) {
-      free(rbuf);
+   r = calloc(sizeof(char*), n + 1); // splits plus NULL pointer termination
+   if (!r) {
+      free(r);
       return NULL;
    }
 
    strcpy(rbuf, p); // keep original
-   for (rsegs[0] = strtok(rbuf, "/"), i = 0 ; (rsegs[i] = strtok(NULL, "/")) ; i++);
+   for (c = rbuf, i = 0 ; i < n && c ; i++) {
+      r[i] = c;
+      c = strstr(c, delim);
+      if (c) {
+         *c = '\0';
+         c += dlen;
+      }
+   }
+   r[i] = NULL;
 
-   return rsegs;
+   return r;
+}
+
+char** Segments (char *p)
+{
+   if (*p == '/') p++; // Ignore leading slash
+
+   return SplitN (p, "/", -1);
 }
 
 // Count Segments
