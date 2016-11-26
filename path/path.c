@@ -101,10 +101,10 @@ char *PathFromSegments(char *prefix, char **seg)
 
    retlen = strlen(prefix);
    for (i = 0 ; seg[i] ; i++) {
-      retlen += strlen(seg[i]) + 1;
+      retlen += strlen(seg[i]) + 1; // count each segment length + /.
    }
 
-   ret = malloc(retlen + 1);
+   ret = malloc(retlen + 1); // allocate final string size + null terminator.
    if (!ret) return NULL;
 
    strcpy(ret, prefix);
@@ -153,8 +153,9 @@ int ParsePath (char *dst, char *txt)
       }
       err = ParseCidToPath (dst+plen, txt);
       if (err == 0) { // only change dst if ParseCidToPath returned success.
-         memcpy (dst, prefix, plen); // use memcpy to don't copy null terminator.
-         return 0;
+         // Use memcpy instead of strcpy to avoid overwriting
+         // result of ParseCidToPath with a null terminator.
+         memcpy (dst, prefix, plen);
       }
       return err;
    }
