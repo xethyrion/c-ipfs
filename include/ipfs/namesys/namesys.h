@@ -8,12 +8,16 @@
             NULL,
             "ErrAllocFailed",
             "ErrNULLPointer",
+            "ErrPipe",
+            "ErrPoll",
             "Could not publish name."
             "Could not resolve name.",
             "Could not resolve name (recursion limit exceeded).",
             "expired record",
             "unrecognized validity type",
-            "not a valid proquint string"
+            "not a valid proquint string",
+            "not a valid domain name",
+            "not a valid dnslink entry"
         };
     #else
         extern char *ErrNamesys;
@@ -22,12 +26,16 @@
     enum {
         ErrAllocFailed = 1,
         ErrNULLPointer,
+        ErrPipe,
+        ErrPoll,
         ErrPublishFailed,
         ErrResolveFailed,
         ErrResolveRecursion,
         ErrExpiredRecord,
         ErrUnrecognizedValidity,
-        ErrInvalidProquint
+        ErrInvalidProquint,
+        ErrInvalidDomain,
+        ErrInvalidDNSLink
     } NamesysErrs;
 
     typedef struct s_resolvers {
@@ -73,4 +81,9 @@
     int IsExtendedTLD (char *s);
     int IsTLD (char *s);
     int IsDomain (char *s);
+
+    int DNSResolverResolveOnce (DNSResolver *r, char **path, char *name);
+    int workDomain (int output, DNSResolver *r, char *name);
+    int parseEntry (char **Path, char *txt);
+    int tryParseDnsLink (char **Path, char *txt);
 #endif //NAMESYS_H
