@@ -23,11 +23,17 @@
  * @param cid where to put the results
  * @returns true(1) on success
  */
-int cid_new(int version, unsigned char* hash, size_t hash_length, const char codec, struct Cid* cid) {
+int ipfs_cid_new(int version, unsigned char* hash, size_t hash_length, const char codec, struct Cid** ptrToCid) {
 	// allocate memory
-	cid->hash = malloc(sizeof(unsigned char) * hash_length);
-	if (cid->hash == NULL)
+	*ptrToCid = (struct Cid*)malloc(sizeof(struct Cid));
+	struct Cid* cid = *ptrToCid;
+	if (cid == NULL)
 		return 0;
+	cid->hash = malloc(sizeof(unsigned char) * hash_length);
+	if (cid->hash == NULL) {
+		free(cid);
+		return 0;
+	}
 	// assign values
 	cid->version = version;
 	cid->codec = codec;
@@ -43,9 +49,10 @@ int cid_new(int version, unsigned char* hash, size_t hash_length, const char cod
  * @param cid the struct
  * @returns 1
  */
-int cid_free(struct Cid* cid) {
+int ipfs_cid_free(struct Cid* cid) {
 	if (cid->hash != NULL)
 		free(cid->hash);
+	free(cid);
 	return 1;
 }
 
@@ -56,7 +63,7 @@ int cid_free(struct Cid* cid) {
  * @cid the Cid struct to fill
  * @return true(1) on success
  */
-int cid_decode_from_string(const unsigned char* incoming, size_t incoming_length, struct Cid* cid) {
+int ipfs_cid_decode_from_string(const unsigned char* incoming, size_t incoming_length, struct Cid** cid) {
 	int retVal = 0;
 
 	if (incoming_length < 2)
@@ -71,7 +78,7 @@ int cid_decode_from_string(const unsigned char* incoming, size_t incoming_length
 		if (retVal == 0)
 			return 0;
 		// now we have the hash, build the object
-		return cid_new(0, hash, hash_length, CID_PROTOBUF, cid);
+		return ipfs_cid_new(0, hash, hash_length, CID_PROTOBUF, cid);
 	}
 
 	// TODO: finish this
@@ -99,7 +106,7 @@ int cid_decode_from_string(const unsigned char* incoming, size_t incoming_length
  * @param incoming_size the size of the array
  * @param cid the Cid structure to fill
  */
-int cid_cast(unsigned char* incoming, size_t incoming_size, struct Cid* cid) {
+int ipfs_cid_cast(unsigned char* incoming, size_t incoming_size, struct Cid* cid) {
 	// this is a multihash
 	if (incoming_size == 34 && incoming[0] == 18 && incoming[1] == 32) {
 		cid->hash_length = mh_multihash_length(incoming, incoming_size);

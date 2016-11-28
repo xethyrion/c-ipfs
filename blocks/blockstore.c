@@ -37,5 +37,8 @@ int ipfs_blockstore_get(struct Cid* cid, struct Block* block) {
  * @returns true(1) on success
  */
 int ipfs_blockstore_put(struct Block* block) {
+	// from blockstore.go line 118
+	// TODO: Get Datastore key
+	// TODO: send to Put with key
 	return 0;
 }
