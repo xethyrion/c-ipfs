@@ -31,39 +31,39 @@ int repo_config_write_config_file(char* full_filename, struct RepoConfig* config
 	
 	fprintf(out_file, "{\n");
 	fprintf(out_file, " \"Identity\": {\n");
-	fprintf(out_file, "  \"PeerID\": \"%s\",\n", config->identity.peer_id);
+	fprintf(out_file, "  \"PeerID\": \"%s\",\n", config->identity->peer_id);
 	// print correct format of private key
 	// first base 64 it
-	size_t encoded_size = libp2p_crypto_encoding_base64_encode_size(config->identity.private_key.der_length);
+	size_t encoded_size = libp2p_crypto_encoding_base64_encode_size(config->identity->private_key.der_length);
 	unsigned char encoded_buffer[encoded_size + 1];
-	int retVal = libp2p_crypto_encoding_base64_encode(config->identity.private_key.der, config->identity.private_key.der_length, encoded_buffer, encoded_size, &encoded_size);
+	int retVal = libp2p_crypto_encoding_base64_encode(config->identity->private_key.der, config->identity->private_key.der_length, encoded_buffer, encoded_size, &encoded_size);
 	if (retVal == 0)
 		return 0;
 	encoded_buffer[encoded_size] = 0;
 	fprintf(out_file, "  \"PrivKey\": \"%s\"\n", encoded_buffer);
 	fprintf(out_file, " },\n");
 	fprintf(out_file, " \"Datastore\": {\n");
-	fprintf(out_file, "  \"Type\": \"%s\",\n", config->datastore.type);
-	fprintf(out_file, "  \"Path\": \"%s\",\n", config->datastore.path);
-	fprintf(out_file, "  \"StorageMax\": \"%s\",\n", config->datastore.storage_max);
-	fprintf(out_file, "  \"StorageGCWatermark\": %d,\n", config->datastore.storage_gc_watermark);
-	fprintf(out_file, "  \"GCPeriod\": \"%s\",\n", config->datastore.gc_period);
+	fprintf(out_file, "  \"Type\": \"%s\",\n", config->datastore->type);
+	fprintf(out_file, "  \"Path\": \"%s\",\n", config->datastore->path);
+	fprintf(out_file, "  \"StorageMax\": \"%s\",\n", config->datastore->storage_max);
+	fprintf(out_file, "  \"StorageGCWatermark\": %d,\n", config->datastore->storage_gc_watermark);
+	fprintf(out_file, "  \"GCPeriod\": \"%s\",\n", config->datastore->gc_period);
 	fprintf(out_file, "  \"Params\": null,\n");
-	fprintf(out_file, "  \"NoSync\": %s,\n", config->datastore.no_sync ? "true" : "false");
-	fprintf(out_file, "  \"HashOnRead\": %s,\n", config->datastore.hash_on_read ? "true" : "false");
-	fprintf(out_file, "  \"BloomFilterSize\": %d\n", config->datastore.bloom_filter_size);
+	fprintf(out_file, "  \"NoSync\": %s,\n", config->datastore->no_sync ? "true" : "false");
+	fprintf(out_file, "  \"HashOnRead\": %s,\n", config->datastore->hash_on_read ? "true" : "false");
+	fprintf(out_file, "  \"BloomFilterSize\": %d\n", config->datastore->bloom_filter_size);
 	fprintf(out_file, " },\n \"Addresses\": {\n");
 	fprintf(out_file, "  \"Swarm\": [\n");
-	for(int i = 0; i < config->addresses.swarm.num_addresses; i++) {
-		fprintf(out_file, "   \"%s\"", config->addresses.swarm.addresses[i]);
-		if (i != (config->addresses.swarm.num_addresses - 1))
+	for(int i = 0; i < config->addresses->swarm->num_addresses; i++) {
+		fprintf(out_file, "   \"%s\"", config->addresses->swarm->addresses[i]);
+		if (i != (config->addresses->swarm->num_addresses - 1))
 			fprintf(out_file, ",\n");
 		else
 			fprintf(out_file, "\n");
 	}
 	fprintf(out_file, "  ],\n");
-	fprintf(out_file, "  \"API\": \"%s\",\n", config->addresses.api);
-	fprintf(out_file, "  \"Gateway\": \"%s\"\n", config->addresses.gateway);
+	fprintf(out_file, "  \"API\": \"%s\",\n", config->addresses->api);
+	fprintf(out_file, "  \"Gateway\": \"%s\"\n", config->addresses->gateway);
 	fprintf(out_file, " },\n  \"Mounts\": {\n");
 	fprintf(out_file, "  \"IPFS\": \"%s\",\n", config->mounts.ipfs);
 	fprintf(out_file, "  \"IPNS\": \"%s\",\n", config->mounts.ipns);
@@ -86,15 +86,15 @@ int repo_config_write_config_file(char* full_filename, struct RepoConfig* config
 	fprintf(out_file, " ],\n \"Tour\": {\n  \"Last\": \"\"\n },\n");
 	fprintf(out_file, " \"Gateway\": {\n");
 	fprintf(out_file, "  \"HTTPHeaders\": {\n");
-	for (int i = 0; i < config->gateway.http_headers.num_elements; i++) {
-		fprintf(out_file, "   \"%s\": [\n    \"%s\"\n  ]", config->gateway.http_headers.headers[i]->header, config->gateway.http_headers.headers[i]->value);
-		if (i < config->gateway.http_headers.num_elements - 1)
+	for (int i = 0; i < config->gateway->http_headers->num_elements; i++) {
+		fprintf(out_file, "   \"%s\": [\n    \"%s\"\n  ]", config->gateway->http_headers->headers[i]->header, config->gateway->http_headers->headers[i]->value);
+		if (i < config->gateway->http_headers->num_elements - 1)
 			fprintf(out_file, ",\n");
 		else
 			fprintf(out_file, "\n },\n");
 	}
-	fprintf(out_file, "  \"RootRedirect\": \"%s\"\n", config->gateway.root_redirect);
-	fprintf(out_file, "  \"Writable\": %s\n", config->gateway.writable ? "true" : "false");
+	fprintf(out_file, "  \"RootRedirect\": \"%s\"\n", config->gateway->root_redirect);
+	fprintf(out_file, "  \"Writable\": %s\n", config->gateway->writable ? "true" : "false");
 	fprintf(out_file, "  \"PathPrefixes\": []\n");
 	fprintf(out_file, " },\n \"SupernodeRouting\": {\n");
 	fprintf(out_file, "  \"Servers\": null\n },");
@@ -120,9 +120,12 @@ int ipfs_repo_fsrepo_new(char* repo_path, struct RepoConfig* config, struct FSRe
 		char* home_dir = os_utils_get_homedir();
 		char* default_subdir = "/.ipfs";
 		unsigned long newPathLen = strlen(home_dir) + strlen(default_subdir) + 2;  // 1 for slash and 1 for end
-		char* newPath = malloc(sizeof(char) * newPathLen);
-		os_utils_filepath_join(os_utils_get_homedir(), default_subdir, newPath, newPathLen);
-		(*repo)->path = newPath;
+		(*repo)->path = malloc(sizeof(char) * newPathLen);
+		if ((*repo)->path == NULL) {
+			free( (*repo));
+			return 0;
+		}
+		os_utils_filepath_join(os_utils_get_homedir(), default_subdir, (*repo)->path, newPathLen);
 	} else {
 		int len = strlen(repo_path) + 1;
 		(*repo)->path = (char*)malloc(len);
@@ -152,9 +155,12 @@ int ipfs_repo_fsrepo_new(char* repo_path, struct RepoConfig* config, struct FSRe
  */
 int ipfs_repo_fsrepo_free(struct FSRepo* repo) {
 	if (repo != NULL) {
-		free(repo->path);
-		ipfs_repo_config_free(repo->config);
-		ipfs_repo_config_datastore_free(repo->data_store);
+		if (repo->path != NULL)
+			free(repo->path);
+		if (repo->config != NULL)
+			ipfs_repo_config_free(repo->config);
+		if (repo->data_store != NULL)
+			ipfs_repo_config_datastore_free(repo->data_store);
 		free(repo);
 	}
 	return 1;
@@ -349,11 +355,11 @@ int fs_repo_open_config(struct FSRepo* repo) {
 		return 0;
 	}
 	// the next should be the array, then string "PeerID"
-	_get_json_string_value(data, tokens, num_tokens, curr_pos, "PeerID", &repo->config->identity.peer_id);
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "PeerID", &repo->config->identity->peer_id);
 	char* priv_key_base64;
 	// then PrivKey
 	_get_json_string_value(data, tokens, num_tokens, curr_pos, "PrivKey", &priv_key_base64);
-	retVal = repo_config_identity_build_private_key(&repo->config->identity, priv_key_base64);
+	retVal = repo_config_identity_build_private_key(repo->config->identity, priv_key_base64);
 	if (retVal == 0) {
 		free(data);
 		free(priv_key_base64);
@@ -361,15 +367,15 @@ int fs_repo_open_config(struct FSRepo* repo) {
 	}
 	// now the datastore
 	int datastore_position = _find_token(data, tokens, num_tokens, 0, "Datastore");
-	_get_json_string_value(data, tokens, num_tokens, curr_pos, "Type", &repo->config->datastore.type);
-	_get_json_string_value(data, tokens, num_tokens, curr_pos, "Path", &repo->config->datastore.path);
-	_get_json_string_value(data, tokens, num_tokens, curr_pos, "StorageMax", &repo->config->datastore.storage_max);
-	_get_json_int_value(data, tokens, num_tokens, curr_pos, "StorageGCWatermark", &repo->config->datastore.storage_gc_watermark);
-	_get_json_string_value(data, tokens, num_tokens, curr_pos, "GCPeriod", &repo->config->datastore.gc_period);
-	_get_json_string_value(data, tokens, num_tokens, curr_pos, "Params", &repo->config->datastore.params);
-	_get_json_int_value(data, tokens, num_tokens, curr_pos, "NoSync", &repo->config->datastore.no_sync);
-	_get_json_int_value(data, tokens, num_tokens, curr_pos, "HashOnRead", &repo->config->datastore.hash_on_read);
-	_get_json_int_value(data, tokens, num_tokens, curr_pos, "BloomFilterSize", &repo->config->datastore.bloom_filter_size);
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "Type", &repo->config->datastore->type);
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "Path", &repo->config->datastore->path);
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "StorageMax", &repo->config->datastore->storage_max);
+	_get_json_int_value(data, tokens, num_tokens, curr_pos, "StorageGCWatermark", &repo->config->datastore->storage_gc_watermark);
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "GCPeriod", &repo->config->datastore->gc_period);
+	_get_json_string_value(data, tokens, num_tokens, curr_pos, "Params", &repo->config->datastore->params);
+	_get_json_int_value(data, tokens, num_tokens, curr_pos, "NoSync", &repo->config->datastore->no_sync);
+	_get_json_int_value(data, tokens, num_tokens, curr_pos, "HashOnRead", &repo->config->datastore->hash_on_read);
+	_get_json_int_value(data, tokens, num_tokens, curr_pos, "BloomFilterSize", &repo->config->datastore->bloom_filter_size);
 
 	// free the memory used reading the json file
 	free(data);
@@ -396,7 +402,7 @@ int fs_repo_open_datastore(struct FSRepo* repo) {
 	char** argv = NULL;
 
 	// copy struct from config area to this area
-	repo->data_store = &repo->config->datastore;
+	repo->data_store = repo->config->datastore;
 
 	if (strncmp(repo->data_store->type, "lmdb", 4) == 0) {
 		// this is a LightningDB. Open it.

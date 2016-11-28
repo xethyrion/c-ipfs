@@ -27,19 +27,29 @@ int test_init_new_installation() {
 	// run the methods
 
 	retVal = request.cmd.pre_run(&request);
-	if (retVal == 0)
+	if (retVal == 0) {
+		free(request.invoc_context);
+		ipfs_cmd_ipfs_init_command_free(&request.cmd);
 		return 0;
+	}
 
 	retVal = request.cmd.run(&request);
-	if (retVal == 0)
+	if (retVal == 0) {
+		free(request.invoc_context);
+		ipfs_cmd_ipfs_init_command_free(&request.cmd);
 		return 0;
+	}
 
 	retVal = request.cmd.post_run(&request);
-	if (retVal == 0)
+	if (retVal == 0) {
+		free(request.invoc_context);
+		ipfs_cmd_ipfs_init_command_free(&request.cmd);
 		return 0;
+	}
 
 	// clean up
 	ipfs_cmd_ipfs_init_command_free( &request.cmd );
+	free(request.invoc_context);
 
 	// make sure the repository exists
 	retVal = os_utils_file_exists("/tmp/.ipfs/config");

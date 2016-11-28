@@ -12,6 +12,7 @@
 
 #include "ipfs/repo/config/swarm.h"
 
+
 int repo_config_swarm_address_init(struct SwarmAddresses* swarm_addresses, char** addresses, int array_length) {
 	// allocate memory for the addresses array
 	swarm_addresses->addresses = malloc(sizeof(char*) * array_length);
@@ -33,10 +34,23 @@ int repo_config_swarm_address_init(struct SwarmAddresses* swarm_addresses, char*
 	return 1;
 }
 
+int repo_config_swarm_address_new(struct SwarmAddresses** swarm_addresses) {
+	*swarm_addresses = (struct SwarmAddresses*)malloc(sizeof(struct SwarmAddresses));
+	if (*swarm_addresses == NULL)
+		return 0;
+
+	(*swarm_addresses)->num_addresses = 0;
+	(*swarm_addresses)->addresses = NULL;
+	return 1;
+}
+
 int repo_config_swarm_address_free(struct SwarmAddresses* swarm_addresses) {
-	for (int i = 0; i < swarm_addresses->num_addresses; i++) {
-		free(swarm_addresses->addresses[i]);
+	if (swarm_addresses->addresses != NULL) {
+		for (int i = 0; i < swarm_addresses->num_addresses; i++) {
+			free(swarm_addresses->addresses[i]);
+		}
+		free(swarm_addresses->addresses);
 	}
-	free(swarm_addresses->addresses);
+	free(swarm_addresses);
 	return 1;
 }

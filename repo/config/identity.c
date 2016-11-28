@@ -55,8 +55,9 @@ int repo_config_identity_init(struct Identity* identity, unsigned long num_bits_
 	if (!libp2p_crypto_rsa_generate_keypair( &(identity->private_key), num_bits_for_keypair))
 		return 0;
 
-	repo_config_identity_build_peer_id(identity);
-	
+	if (repo_config_identity_build_peer_id(identity) == 0)
+		return 0;
+
 	return 1;
 }
 
@@ -66,6 +67,9 @@ int repo_config_identity_new(struct Identity** identity) {
 		return 0;
 
 	memset(*identity, 0, sizeof(struct Identity));
+
+	(*identity)->peer_id = NULL;
+
 	return 1;
 }
 
@@ -75,6 +79,8 @@ int repo_config_identity_free(struct Identity* identity) {
 			free(identity->private_key.public_key_der);
 		if (identity->private_key.der != NULL)
 			free(identity->private_key.der);
+		if (identity->peer_id != NULL)
+			free(identity->peer_id);
 		free(identity);
 	}
 	return 1;

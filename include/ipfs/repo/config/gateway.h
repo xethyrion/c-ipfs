@@ -28,9 +28,13 @@ struct Gateway {
 	char* root_redirect;
 	int writable;
 	struct PathPrefixes path_prefixes;
-	struct HTTPHeaders http_headers;
+	struct HTTPHeaders* http_headers;
 };
 
 int repo_config_gateway_http_header_init(struct HTTPHeaders* http_headers, char** headers, char** values, int num_elements);
+
+int repo_config_gateway_new(struct Gateway** gateway);
+
+int repo_config_gateway_free(struct Gateway* gateway);
 
 #endif /* gateway_h */

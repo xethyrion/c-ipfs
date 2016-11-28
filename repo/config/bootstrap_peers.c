@@ -53,5 +53,6 @@ int repo_config_bootstrap_peers_free(struct BootstrapPeers* list) {
 			free(list->peers[i]);
 		}
 	}
+	free(list->peers);
 	return 1;
 }

@@ -31,15 +31,15 @@ struct Reprovider {
 };
 
 struct RepoConfig {
-	struct Identity identity;
-	struct Datastore datastore;
-	struct Addresses addresses;
+	struct Identity* identity;
+	struct Datastore* datastore;
+	struct Addresses* addresses;
 	struct Mounts mounts;
 	struct Discovery discovery;
 	struct Ipns ipns;
 	struct BootstrapPeers peer_addresses;
 	//struct tour tour;
-	struct Gateway gateway;
+	struct Gateway* gateway;
 	//struct supernode_routing supernode_client_config;
 	//struct api api;
 	struct Reprovider reprovider;

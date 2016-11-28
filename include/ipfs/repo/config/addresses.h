@@ -12,7 +12,7 @@
 #include "swarm.h"
 
 struct Addresses {
-	struct SwarmAddresses swarm;
+	struct SwarmAddresses* swarm;
 	char* api;
 	char* gateway;
 };
@@ -24,10 +24,10 @@ struct Addresses {
  * @param gateway the gateway address (like "ip4/127.0.0.1/tcp/8080")
  * @returns true(1) on success, otherwise false(0)
  */
-int repo_config_addresses_init(struct Addresses* addresses, char* api, char* gateway);
+int repo_config_addresses_new(struct Addresses** addresses, char* api, char* gateway);
 
 /**
- * clear any memory allocated by a address_init call
+ * clear any memory allocated by a address_new call
  * @param addresses the struct
  * @returns true(1)
  */

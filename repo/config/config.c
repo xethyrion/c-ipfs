@@ -89,7 +89,7 @@ int repo_config_get_file_name(char* path, char** result) {
  */
 int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair, char* repo_path) {
 	// identity
-	int retVal = repo_config_identity_init(&(config->identity), num_bits_for_keypair);
+	int retVal = repo_config_identity_init(config->identity, num_bits_for_keypair);
 	if (retVal == 0)
 		return 0;
 	
@@ -99,17 +99,13 @@ int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypai
 		return 0;
 	
 	// datastore
-	retVal = ipfs_repo_config_datastore_init(&(config->datastore), repo_path);
+	retVal = ipfs_repo_config_datastore_init(config->datastore, repo_path);
 	if (retVal == 0)
 		return 0;
 
-	retVal = repo_config_addresses_init(&(config->addresses), "/ip4/127.0.0.1/tcp/5001", "/ip4/127.0.0.1/tcp/8080");
-	if (retVal == 0)
-		return 0;
-	
 	// swarm addresses
 	char** address_array = (char * []){ "/ip4/0.0.0.0/tcp/4001", "/ip6/::/tcp/4001" };
-	retVal = repo_config_swarm_address_init(&(config->addresses.swarm), address_array, 2);
+	retVal = repo_config_swarm_address_init(config->addresses->swarm, address_array, 2);
 	if (retVal == 0)
 		return 0;
 	
@@ -123,15 +119,15 @@ int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypai
 	
 	config->reprovider.interval = "12h";
 	
-	config->gateway.root_redirect = "";
-	config->gateway.writable = 0;
+	config->gateway->root_redirect = "";
+	config->gateway->writable = 0;
 	
-	config->gateway.path_prefixes.num_elements = 0;
+	config->gateway->path_prefixes.num_elements = 0;
 
 	// gateway http headers
 	char** header_array = (char * []) { "Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers" };
 	char** header_values = (char*[])  { "*", "GET", "X-Requested-With" };
-	retVal = repo_config_gateway_http_header_init(&(config->gateway.http_headers), header_array, header_values, 3);
+	retVal = repo_config_gateway_http_header_init(config->gateway->http_headers, header_array, header_values, 3);
 	if (retVal == 0)
 		return 0;
 	
@@ -147,6 +143,28 @@ int ipfs_repo_config_new(struct RepoConfig** config) {
 	*config = (struct RepoConfig*)malloc(sizeof(struct RepoConfig));
 	if (*config == NULL)
 		return 0;
+
+	// set initial values
+	(*config)->peer_addresses.num_peers = 0;
+	(*config)->peer_addresses.peers = NULL;
+
+	int retVal = 1;
+	retVal = repo_config_identity_new(&((*config)->identity));
+	if (retVal == 0)
+		return 0;
+
+	retVal = ipfs_repo_config_datastore_new(&((*config)->datastore));
+	if (retVal == 0)
+		return 0;
+
+	retVal = repo_config_addresses_new(&((*config)->addresses), "/ip4/127.0.0.1/tcp/5001", "/ip4/127.0.0.1/tcp/8080");
+	if (retVal == 0)
+		return 0;
+
+	retVal = repo_config_gateway_new(&((*config)->gateway));
+	if (retVal == 0)
+		return 0;
+
 	return 1;
 }
 
@@ -157,9 +175,11 @@ int ipfs_repo_config_new(struct RepoConfig** config) {
  */
 int ipfs_repo_config_free(struct RepoConfig* config) {
 	if (config != NULL) {
+		repo_config_identity_free(config->identity);
 		repo_config_bootstrap_peers_free(&(config->peer_addresses));
-		//ipfs_repo_config_datastore_free(&(config->datastore));
-		repo_config_addresses_free(&(config->addresses));
+		ipfs_repo_config_datastore_free(config->datastore);
+		repo_config_addresses_free(config->addresses);
+		repo_config_gateway_free(config->gateway);
 		free(config);
 	}
 	return 1;
