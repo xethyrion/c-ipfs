@@ -50,6 +50,12 @@ int os_utils_file_exists(const char* file_name) {
 	return 0;
 }
 
+int os_utils_directory_exists(const char* directory_name) {
+	if (access(directory_name, F_OK) != -1)
+		return 1;
+	return 0;
+}
+
 int os_utils_directory_writeable(const char* path) {
 	int result = access(path, W_OK);
 	return result == 0;

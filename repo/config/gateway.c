@@ -41,3 +41,33 @@ int repo_config_gateway_http_header_init(struct HTTPHeaders* http_headers, char*
 	http_headers->num_elements = num_elements;
 	return 1;
 }
+
+int repo_config_gateway_new(struct Gateway** gateway) {
+	*gateway = (struct Gateway*)malloc(sizeof(struct Gateway));
+	if (*gateway == NULL)
+		return 0;
+	(*gateway)->http_headers = (struct HTTPHeaders*)malloc(sizeof(struct HTTPHeaders));
+	if ((*gateway)->http_headers == NULL) {
+		free(*gateway);
+		return 0;
+	}
+	(*gateway)->http_headers->num_elements = 0;
+	(*gateway)->http_headers->headers = NULL;
+	return 1;
+}
+
+int repo_config_gateway_free(struct Gateway* gateway) {
+	if (gateway->http_headers != NULL) {
+		for(int i = 0; i < gateway->http_headers->num_elements; i++) {
+			struct HTTPHeader* currHeader = gateway->http_headers->headers[i];
+			free(currHeader->header);
+			free(currHeader->value);
+			free(currHeader);
+		}
+		if (gateway->http_headers->headers != NULL)
+			free(gateway->http_headers->headers); // from init
+		free(gateway->http_headers); // from new
+	}
+	free(gateway); // from new
+	return 1;
+}

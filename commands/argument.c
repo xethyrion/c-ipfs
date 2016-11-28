@@ -4,6 +4,7 @@
 #include "ipfs/commands/argument.h"
 
 int commands_argument_free(struct Argument* argument) {
+	free(argument);
 	return 1;
 }
 

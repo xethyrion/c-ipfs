@@ -36,4 +36,6 @@ int os_utils_file_size(const char* file_name);
 
 int os_utils_directory_writeable(const char* path);
 
+int os_utils_directory_exists(const char* path);
+
 #endif /* utils_h */

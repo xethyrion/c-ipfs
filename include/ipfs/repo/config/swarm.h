@@ -23,8 +23,9 @@ struct SwarmAddresses {
  */
 int repo_config_swarm_address_init(struct SwarmAddresses* swarm_addresses, char** addresses, int array_length);
 
+int repo_config_swarm_address_new(struct SwarmAddresses** swarm_addresses);
 /***
- * free up memory from repo_config_swarm_address_init
+ * free up memory from repo_config_swarm_address_new
  * @param swarm_addresses the structure
  * @returns true(1)
  */

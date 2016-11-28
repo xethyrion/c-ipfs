@@ -20,18 +20,28 @@ char* alloc_and_copy(char* source) {
 	return result;
 }
 
-int repo_config_addresses_init(struct Addresses* addresses, char* api, char* gateway) {
-	// allocate memory to store api and gateway
-	addresses->api = alloc_and_copy(api);
-	addresses->gateway = alloc_and_copy(gateway);
-	if (addresses->api == NULL || addresses->gateway == NULL)
+int repo_config_addresses_new(struct Addresses** addresses, char* api, char* gateway) {
+	*addresses = (struct Addresses*)malloc(sizeof(struct Addresses));
+	if (*addresses == NULL)
 		return 0;
+
+	// allocate memory to store api and gateway
+	(*addresses)->api = alloc_and_copy(api);
+	(*addresses)->gateway = alloc_and_copy(gateway);
+	if ( (*addresses)->api == NULL || (*addresses)->gateway == NULL)
+		return 0;
+
+	// allocate memory for swarm_addresses
+	if (repo_config_swarm_address_new(&((*addresses)->swarm)) == 0)
+		return 0;
+
 	return 1;
 }
 
 int repo_config_addresses_free(struct Addresses* addresses) {
 	free(addresses->api);
 	free(addresses->gateway);
-	repo_config_swarm_address_free(&(addresses->swarm));
+	repo_config_swarm_address_free(addresses->swarm);
+	free(addresses);
 	return 1;
 }

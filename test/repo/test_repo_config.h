@@ -13,6 +13,19 @@
 #include "ipfs/repo/fsrepo/fs_repo.h"
 #include "ipfs/os/utils.h"
 
+int test_repo_config_new() {
+	struct RepoConfig* repoConfig;
+	int retVal = ipfs_repo_config_new(&repoConfig);
+	if (retVal == 0)
+		return 0;
+
+	retVal = ipfs_repo_config_free(repoConfig);
+	if (retVal == 0)
+		return 0;
+
+	return 1;
+}
+
 int test_repo_config_init() {
 	struct RepoConfig* repoConfig;
 	int retVal = ipfs_repo_config_new(&repoConfig);
@@ -26,29 +39,29 @@ int test_repo_config_init() {
 	// now tear it apart to check for anything broken
 
 	// addresses
-	retVal = strncmp(repoConfig->addresses.api, "/ip4/127.0.0.1/tcp/5001", 23);
+	retVal = strncmp(repoConfig->addresses->api, "/ip4/127.0.0.1/tcp/5001", 23);
 	if (retVal != 0)
 		return 0;
-	retVal = strncmp(repoConfig->addresses.gateway, "/ip4/127.0.0.1/tcp/8080", 23);
-	if (retVal != 0)
-		return 0;
-	
-	if (repoConfig->addresses.swarm.num_addresses != 2)
-		return 0;
-	
-	retVal = strncmp(repoConfig->addresses.swarm.addresses[0], "/ip4/0.0.0.0/tcp/4001", 21);
+	retVal = strncmp(repoConfig->addresses->gateway, "/ip4/127.0.0.1/tcp/8080", 23);
 	if (retVal != 0)
 		return 0;
 	
-	retVal = strncmp(repoConfig->addresses.swarm.addresses[1], "/ip6/::/tcp/4001", 16);
+	if (repoConfig->addresses->swarm->num_addresses != 2)
+		return 0;
+	
+	retVal = strncmp(repoConfig->addresses->swarm->addresses[0], "/ip4/0.0.0.0/tcp/4001", 21);
+	if (retVal != 0)
+		return 0;
+	
+	retVal = strncmp(repoConfig->addresses->swarm->addresses[1], "/ip6/::/tcp/4001", 16);
 	if (retVal != 0)
 		return 0;
 	
 	// datastore
-	retVal = strncmp(repoConfig->datastore.path, "/Users/JohnJones/.ipfs/datastore", 32);
+	retVal = strncmp(repoConfig->datastore->path, "/Users/JohnJones/.ipfs/datastore", 32);
 	if (retVal != 0)
 		return 0;
-	
+
 	ipfs_repo_config_free(repoConfig);
 	
 	return 1;

@@ -10,6 +10,7 @@ all:
 	cd multibase; make all;
 	cd os; make all;
 	cd repo; make all;
+	cd flatfs; make all;
 	cd thirdparty; make all;
 	cd test; make all;
 	
@@ -21,6 +22,7 @@ clean:
 	cd multibase; make clean;
 	cd os; make clean;
 	cd repo; make clean;
+	cd flatfs; make clean;
 	cd thirdparty; make clean;
 	cd test; make clean;
 	

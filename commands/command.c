@@ -17,6 +17,7 @@ int commands_command_init(struct Command* cmd) {
 	// allocate memory for each argument
 	for(int i = 0; i < cmd->argument_count; i++)
 		cmd->arguments[i] = malloc(sizeof(struct Argument));
+
 	// allocate memory for CommandOption array
 	cmd->options = malloc(cmd->option_count * sizeof(struct CommandOption*));
 	if (cmd->options == NULL)
@@ -32,6 +33,7 @@ int commands_command_free(struct Command* cmd) {
 	for(int i = 0; i < cmd->argument_count; i++)
 		commands_argument_free(cmd->arguments[i]);
 	free(cmd->arguments);
+
 	//command options
 	for(int i = 0; i < cmd->option_count; i++)
 		commands_command_option_free(cmd->options[i]);

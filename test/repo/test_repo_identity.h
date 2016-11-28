@@ -15,14 +15,24 @@
 #include "libp2p/crypto/encoding/base64.h"
 
 int test_repo_config_identity_new() {
-	struct Identity identity;
-	int retVal = repo_config_identity_init(&identity, 2046);
+	struct Identity* identity;
+	int retVal = repo_config_identity_new(&identity);
+	if (retVal == 0)
+		return 0;
+
+	retVal = repo_config_identity_init(identity, 2046);
+	if (retVal == 0)
+		return 0;
+
 	// now examine it
-	int privateKeySize = sizeof(identity.private_key);
+	int privateKeySize = sizeof(identity->private_key);
 	if (privateKeySize < 0) {
 		printf("Private key structure size should be greater than 0\n");
-		retVal = 0;
+		return 0;
 	}
+
+	retVal = repo_config_identity_free(identity);
+
 	return retVal;
 }
 
@@ -34,6 +44,7 @@ int test_repo_config_identity_private_key() {
 	libp2p_crypto_encoding_base64_decode(priv_b64, strlen(priv_b64), out_buff, decoded_len, &decoded_len);
 	char str[decoded_len];
 	int j = 0;
+	free(out_buff);
 	// now test
 	return 1;
 	

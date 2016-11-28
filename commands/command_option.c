@@ -22,5 +22,6 @@ int commands_command_option_init(struct CommandOption* option, char* description
 
 int commands_command_option_free(struct CommandOption* option) {
 	free(option->names);
+	free(option);
 	return 0;
 }

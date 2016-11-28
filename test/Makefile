@@ -7,7 +7,8 @@ OBJS = testit.o ../cmd/ipfs/init.o ../commands/argument.o ../commands/command_op
 	../repo/fsrepo/jsmn.o ../repo/fsrepo/lmdb_datastore.o ../repo/config/config.o ../os/utils.o ../repo/config/identity.o \
 	../repo/config/bootstrap_peers.o ../repo/config/datastore.o ../repo/config/gateway.o \
 	../repo/config/addresses.o ../repo/config/swarm.o ../repo/config/peer.o \
-	../thirdparty/ipfsaddr/ipfs_addr.o ../cid/cid.o ../multibase/multibase.o
+	../thirdparty/ipfsaddr/ipfs_addr.o ../cid/cid.o ../multibase/multibase.o \
+	../flatfs/flatfs.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
