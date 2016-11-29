@@ -5,6 +5,7 @@
 #include "cmd/ipfs/test_init.h"
 #include "cid/test_cid.h"
 #include "flatfs/test_flatfs.h"
+#include "storage/test_ds_helper.h"
 
 int testit(const char* name, int (*func)(void)) {
 	printf("Testing %s...\n", name);
@@ -33,6 +34,7 @@ int main(int argc, char** argv) {
 	counter += testit("test_flatfs_get_directory", test_flatfs_get_directory);
 	counter += testit("test_flatfs_get_filename", test_flatfs_get_filename);
 	counter += testit("test_flatfs_get_full_filename", test_flatfs_get_full_filename);
+	counter += testit("test_ds_key_from_binary", test_ds_key_from_binary);
 	if (counter > 0) {
 		printf("***** There were %d failed test(s) *****\n", counter);
 	} else {

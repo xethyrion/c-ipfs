@@ -17,7 +17,7 @@ struct Block {
  * @param block a pointer to the struct Block that will be created
  * @returns true(1) on success
  */
-int ipfs_blocks_block_new(unsigned char* data, size_t data_size, struct Block* block);
+int ipfs_blocks_block_new(unsigned char* data, size_t data_size, struct Block** block);
 
 /***
  * Free resources used by the creation of a block

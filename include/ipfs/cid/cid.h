@@ -33,14 +33,14 @@ struct Cid {
  * @param cid where to put the results
  * @returns true(1) on success
  */
-int cid_new(int version, unsigned char* hash, size_t hash_length, const char codec, struct Cid* cid);
+int ipfs_cid_new(int version, unsigned char* hash, size_t hash_length, const char codec, struct Cid** cid);
 
 /***
  * Free the resources from a Cid
  * @param cid the struct
  * @returns 1
  */
-int cid_free(struct Cid* cid);
+int ipfs_cid_free(struct Cid* cid);
 
 /***
  * Fill a Cid struct based on a base 58 encoded string
@@ -49,7 +49,7 @@ int cid_free(struct Cid* cid);
  * @cid the Cid struct to fill
  * @return true(1) on success
  */
-int cid_decode_from_string(const unsigned char* incoming, size_t incoming_length, struct Cid* cid);
+int ipfs_cid_decode_from_string(const unsigned char* incoming, size_t incoming_length, struct Cid** cid);
 
 /***
  * Turn a multibase decoded string of bytes into a Cid struct
@@ -57,6 +57,6 @@ int cid_decode_from_string(const unsigned char* incoming, size_t incoming_length
  * @param incoming_size the size of the array
  * @param cid the Cid structure to fill
  */
-int cid_cast(unsigned char* incoming, size_t incoming_size, struct Cid* cid);
+int ipfs_cid_cast(unsigned char* incoming, size_t incoming_size, struct Cid* cid);
 
 #endif

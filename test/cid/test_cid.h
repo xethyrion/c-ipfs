@@ -10,25 +10,25 @@
 
 int test_cid_new_free() {
 
-	struct Cid cid;
+	struct Cid* cid;
 	const unsigned char* hash = "ABC123";
-	int retVal = cid_new(0, (unsigned char*)hash, strlen((char*)hash), CID_PROTOBUF, &cid);
+	int retVal = ipfs_cid_new(0, (unsigned char*)hash, strlen((char*)hash), CID_PROTOBUF, &cid);
 	if (retVal == 0)
 		return 0;
 
-	if (cid.version != 0)
+	if (cid->version != 0)
 		return 0;
 
-	if (cid.codec != CID_PROTOBUF)
+	if (cid->codec != CID_PROTOBUF)
 		return 0;
 
-	if (cid.hash_length != strlen((char*)hash))
+	if (cid->hash_length != strlen((char*)hash))
 		return 0;
 
-	if (strncmp((char*)cid.hash, (char*)hash, 6) != 0)
+	if (strncmp((char*)cid->hash, (char*)hash, 6) != 0)
 		return 0;
 
-	return cid_free(&cid);
+	return ipfs_cid_free(cid);
 }
 
 /***
@@ -53,7 +53,7 @@ int test_cid_cast_multihash() {
 
 	// now call cast
 	struct Cid cid;
-	retVal = cid_cast(multihash, multihash_size, &cid);
+	retVal = ipfs_cid_cast(multihash, multihash_size, &cid);
 	if (retVal == 0)
 		return 0;
 	// check results
@@ -90,7 +90,7 @@ int test_cid_cast_non_multihash() {
 
 	// now call cast
 	struct Cid cid;
-	int retVal = cid_cast(array, array_size, &cid);
+	int retVal = ipfs_cid_cast(array, array_size, &cid);
 	if (retVal == 0)
 		return 0;
 	// check results
