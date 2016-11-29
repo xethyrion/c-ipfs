@@ -43,7 +43,7 @@ char** SplitN (char *p, char *delim, int n)
 
    r = calloc(sizeof(char*), n + 1); // splits plus NULL pointer termination
    if (!r) {
-      free(r);
+      free(rbuf);
       return NULL;
    }
 

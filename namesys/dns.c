@@ -68,13 +68,6 @@ int DNSResolverResolveOnce (char **path, char *name)
         return ErrPipe;
     }
 
-    dnslink = malloc(strlen(domain) + sizeof(dlprefix));
-    if (!dnslink) {
-        return ErrAllocFailed;
-    }
-    strcpy (dnslink, dlprefix);
-    strcat (dnslink, domain);
-
     r = fork();
     switch(r) {
         case -1:
@@ -90,6 +83,14 @@ int DNSResolverResolveOnce (char **path, char *name)
             return ErrPipe;
         case 0: // child
             close(p2[STDIN_FILENO]); // we don't need to read at child process.
+
+            dnslink = malloc(strlen(domain) + sizeof(dlprefix));
+            if (!dnslink) {
+                return ErrAllocFailed;
+            }
+            strcpy (dnslink, dlprefix);
+            strcat (dnslink, domain);
+
             return workDomain (p2[STDOUT_FILENO], r, dnslink);
     }
     close(p2[STDOUT_FILENO]); // we don't need to write at main process.
