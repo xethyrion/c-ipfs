@@ -1,16 +1,20 @@
 #ifndef IPFS_PATH_H
    #define IPFS_PATH_H
 
-   char *ErrPath[] = {
-       NULL,
-       // ErrBadPath is returned when a given path is incorrectly formatted
-       "invalid 'ipfs ref' path",
-       // Paths after a protocol must contain at least one component
-       "path must contain at least one component",
-       "TODO: ErrCidDecode",
-       NULL,
-       "no link named %s under %s"
-   };
+   #ifdef IPFS_PATH_C
+      char *ErrPath[] = {
+         NULL,
+         // ErrBadPath is returned when a given path is incorrectly formatted
+         "invalid 'ipfs ref' path",
+         // Paths after a protocol must contain at least one component
+         "path must contain at least one component",
+         "TODO: ErrCidDecode",
+         NULL,
+         "no link named %s under %s"
+      };
+   #else
+      extern char **ErrPath;
+   #endif // IPFS_PATH_C
 
    enum {
        ErrBadPath = 1,
