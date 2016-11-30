@@ -88,7 +88,6 @@ int ProquintIsProquint(char *str)
 */
 char *ProquintEncode(char *buf)
 {
-    // TODO: check endianness.
     char *ret;
     int i, c;
     uint16_t n;
@@ -126,7 +125,6 @@ char *ProquintEncode(char *buf)
 */
 char *ProquintDecode(char *str)
 {
-    // TODO: check endianness.
     char *ret;
     int i, c;
     uint16_t x;
