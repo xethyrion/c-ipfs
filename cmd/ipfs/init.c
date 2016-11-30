@@ -61,7 +61,7 @@ int do_init(FILE* out_file, char* repo_root, int empty, int num_bits_for_keypair
 		return 0;
 	//TODO: If the conf is null, make one
 	if ( conf->identity->peer_id == NULL) {
-		int retVal = repo_config_init(conf, num_bits_for_keypair, repo_root);
+		int retVal = ipfs_repo_config_init(conf, num_bits_for_keypair, repo_root);
 		if (retVal == 0)
 			return 0;
 	}
@@ -87,11 +87,12 @@ int init_run(struct Request* request) {
 	// TODO: make sure offline
 	// TODO: check parameters for logic errors
 	// TODO: Initialize
-	struct RepoConfig conf = {0};
+	struct RepoConfig* conf;
+	int retVal = ipfs_repo_config_new(&conf);
 	// TODO: handle files in request
 	// do the heavy lifting
 	int num_bits_for_key_pair = request->cmd.options[0]->default_int_val;
-	return do_init(stdout, request->invoc_context->config_root, 1, num_bits_for_key_pair, &conf);
+	return do_init(stdout, request->invoc_context->config_root, 1, num_bits_for_key_pair, conf);
 }
 
 /***

@@ -6,7 +6,7 @@ CFLAGS += -g3
 endif
 
 DEPS = 
-OBJS = repo.o 
+OBJS =  
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)

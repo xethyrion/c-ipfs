@@ -109,7 +109,7 @@ int repo_config_write_config_file(char* full_filename, struct RepoConfig* config
  * Remember: ipfs_repo_fsrepo_free must be called
  * @param repo_path the path to the repo
  * @param config the optional config file. NOTE: if passed, fsrepo_free will free resources of the RepoConfig.
- * @param repo the struct to fill in
+ * @param repo the struct to allocate memory for
  * @returns false(0) if something bad happened, otherwise true(1)
  */
 int ipfs_repo_fsrepo_new(char* repo_path, struct RepoConfig* config, struct FSRepo** repo) {
@@ -140,11 +140,6 @@ int ipfs_repo_fsrepo_new(char* repo_path, struct RepoConfig* config, struct FSRe
 			return 0;
 		}
 	}
-	if (ipfs_repo_config_datastore_new(&((*repo)->data_store)) == 0) {
-		free(repo_path);
-		ipfs_repo_config_free((*repo)->config);
-		return 0;
-	}
 	return 1;
 }
 
@@ -159,8 +154,6 @@ int ipfs_repo_fsrepo_free(struct FSRepo* repo) {
 			free(repo->path);
 		if (repo->config != NULL)
 			ipfs_repo_config_free(repo->config);
-		if (repo->data_store != NULL)
-			ipfs_repo_config_datastore_free(repo->data_store);
 		free(repo);
 	}
 	return 1;
@@ -347,7 +340,7 @@ int fs_repo_open_config(struct FSRepo* repo) {
 		return 0;
 	}
 	// fill FSRepo struct
-	repo->config = malloc(sizeof(struct RepoConfig));
+	// allocation done by fsrepo_new... repo->config = malloc(sizeof(struct RepoConfig));
 	// Identity
 	int curr_pos = _find_token(data, tokens, num_tokens, 0, "Identity");
 	if (curr_pos < 0) {
@@ -389,7 +382,7 @@ int fs_repo_open_config(struct FSRepo* repo) {
  * @returns true(1) on success
  */
 int fs_repo_setup_lmdb_datastore(struct FSRepo* repo) {
-	return repo_fsrepo_lmdb_cast(repo->data_store);
+	return repo_fsrepo_lmdb_cast(repo->config->datastore);
 }
 
 /***
@@ -401,10 +394,7 @@ int fs_repo_open_datastore(struct FSRepo* repo) {
 	int argc = 0;
 	char** argv = NULL;
 
-	// copy struct from config area to this area
-	repo->data_store = repo->config->datastore;
-
-	if (strncmp(repo->data_store->type, "lmdb", 4) == 0) {
+	if (strncmp(repo->config->datastore->type, "lmdb", 4) == 0) {
 		// this is a LightningDB. Open it.
 		int retVal = fs_repo_setup_lmdb_datastore(repo);
 		if (retVal == 0)
@@ -414,7 +404,7 @@ int fs_repo_open_datastore(struct FSRepo* repo) {
 		return 0;
 	}
 
-	int retVal = repo->data_store->datastore_open(argc, argv, repo->data_store);
+	int retVal = repo->config->datastore->datastore_open(argc, argv, repo->config->datastore);
 
 	// do specific datastore cleanup here if needed
 
@@ -463,6 +453,14 @@ int fs_repo_is_initialized(char* repo_path) {
 	return fs_repo_is_initialized_unsynced(repo_path);
 }
 
+int ipfs_repo_fsrepo_datastore_init(struct FSRepo* fs_repo) {
+	// make the directory
+	repo_fsrepo_lmdb_create_directory(fs_repo->config->datastore);
+
+	// fill in the function prototypes
+	repo_fsrepo_lmdb_cast(fs_repo->config->datastore);
+}
+
 /**
  * Initializes a new FSRepo at the given path with the provided config
  * @param path the path to use
@@ -481,7 +479,7 @@ int ipfs_repo_fsrepo_init(struct FSRepo* repo) {
 		return 0;
 	
 	// TODO: Implement this method
-	//retVal = fs_repo_defaultds_init(path, config);
+	retVal = ipfs_repo_fsrepo_datastore_init(repo);
 	if (retVal == 0)
 		return 0;
 	

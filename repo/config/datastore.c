@@ -40,6 +40,7 @@ int ipfs_repo_config_datastore_new(struct Datastore** datastore) {
 	if (*datastore == NULL)
 		return 0;
 	(*datastore)->path = NULL;
+	(*datastore)->handle = NULL;
 	return 1;
 }
 

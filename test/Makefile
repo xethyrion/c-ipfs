@@ -8,7 +8,8 @@ OBJS = testit.o ../cmd/ipfs/init.o ../commands/argument.o ../commands/command_op
 	../repo/config/bootstrap_peers.o ../repo/config/datastore.o ../repo/config/gateway.o \
 	../repo/config/addresses.o ../repo/config/swarm.o ../repo/config/peer.o \
 	../thirdparty/ipfsaddr/ipfs_addr.o ../cid/cid.o ../multibase/multibase.o \
-	../flatfs/flatfs.o ../datastore/ds_helper.o
+	../flatfs/flatfs.o ../blocks/block.o ../blocks/blockstore.o \
+	../datastore/ds_helper.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)

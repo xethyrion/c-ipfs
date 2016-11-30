@@ -32,7 +32,7 @@ int test_repo_config_init() {
 	if (retVal == 0)
 		return 0;
 
-	retVal = repo_config_init(repoConfig, 2048, "/Users/JohnJones/.ipfs");
+	retVal = ipfs_repo_config_init(repoConfig, 2048, "/Users/JohnJones/.ipfs");
 	if (retVal == 0)
 		return 0;
 	
@@ -77,7 +77,7 @@ int test_repo_config_write() {
 	// now build a new one
 	struct RepoConfig* repoConfig;
 	ipfs_repo_config_new(&repoConfig);
-	if (!repo_config_init(repoConfig, 2048, "/tmp/.ipfs")) {
+	if (!ipfs_repo_config_init(repoConfig, 2048, "/tmp/.ipfs")) {
 		ipfs_repo_config_free(repoConfig);
 		return 0;
 	}

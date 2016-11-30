@@ -16,13 +16,11 @@ struct FSRepo {
 	char* path;
 	struct IOCloser* lock_file;
 	struct RepoConfig* config;
-	struct Datastore* data_store;
 };
 
 /**
  * opens a fsrepo
- * @param repo_path the path to the repo
- * @param repo where to store the repo info
+ * @param repo the repo struct. Should contain the path. This method will do the rest
  * @return 0 if there was a problem, otherwise 1
  */
 int ipfs_repo_fsrepo_open(struct FSRepo* repo);
@@ -43,10 +41,12 @@ int fs_repo_is_initialized(char* repo_path);
 int fs_repo_write_config_file(char* path, struct RepoConfig* config);
 
 /**
- * Initializes a new FSRepo at the given path with the provided config
- * @param repo_path the path to use
- * @param config the information for the config file
- * @returns true(1) on success
+ * constructs the FSRepo struct.
+ * Remember: ipfs_repo_fsrepo_free must be called
+ * @param repo_path the path to the repo
+ * @param config the optional config file. NOTE: if passed, fsrepo_free will free resources of the RepoConfig.
+ * @param repo the struct to allocate memory for
+ * @returns false(0) if something bad happened, otherwise true(1)
  */
 int ipfs_repo_fsrepo_new(char* repo_path, struct RepoConfig* config, struct FSRepo** fs_repo);
 

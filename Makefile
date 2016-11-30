@@ -3,6 +3,7 @@ DEBUG = true
 export DEBUG
 
 all:
+	cd blocks; make all;
 	cd cid; make all;
 	cd cmd; make all;
 	cd commands; make all;
@@ -16,6 +17,7 @@ all:
 	cd test; make all;
 	
 clean:
+	cd blocks; make clean;
 	cd cid; make clean;
 	cd cmd; make clean;
 	cd commands; make clean;
@@ -27,4 +29,5 @@ clean:
 	cd datastore; make clean;
 	cd thirdparty; make clean;
 	cd test; make clean;
-	
+
+rebuild: clean all

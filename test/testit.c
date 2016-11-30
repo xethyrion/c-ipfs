@@ -6,6 +6,8 @@
 #include "cid/test_cid.h"
 #include "flatfs/test_flatfs.h"
 #include "storage/test_ds_helper.h"
+#include "storage/test_datastore.h"
+#include "storage/test_blocks.h"
 
 int testit(const char* name, int (*func)(void)) {
 	printf("Testing %s...\n", name);
@@ -19,6 +21,7 @@ int testit(const char* name, int (*func)(void)) {
 
 int main(int argc, char** argv) {
 	int counter = 0;
+	/*
 	counter += testit("test_cid_new_free", test_cid_new_free);
 	counter += testit("test_cid_cast_multihash", test_cid_cast_multihash);
 	counter += testit("test_cid_cast_non_multihash", test_cid_cast_non_multihash);
@@ -35,6 +38,9 @@ int main(int argc, char** argv) {
 	counter += testit("test_flatfs_get_filename", test_flatfs_get_filename);
 	counter += testit("test_flatfs_get_full_filename", test_flatfs_get_full_filename);
 	counter += testit("test_ds_key_from_binary", test_ds_key_from_binary);
+	counter += testit("test_blocks_new", test_blocks_new);
+	*/
+	counter += testit("test_ipfs_datastore_put", test_ipfs_datastore_put);
 	if (counter > 0) {
 		printf("***** There were %d failed test(s) *****\n", counter);
 	} else {

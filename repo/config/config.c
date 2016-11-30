@@ -87,7 +87,7 @@ int repo_config_get_file_name(char* path, char** result) {
  * @param num_bits_for_keypair number of bits for the key pair
  * @returns true(1) on success, otherwise 0
  */
-int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair, char* repo_path) {
+int ipfs_repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair, char* repo_path) {
 	// identity
 	int retVal = repo_config_identity_init(config->identity, num_bits_for_keypair);
 	if (retVal == 0)

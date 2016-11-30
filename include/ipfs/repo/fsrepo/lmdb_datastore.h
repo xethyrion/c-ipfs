@@ -27,4 +27,11 @@ int repo_fsrepro_lmdb_open(int argc, char** argv, struct Datastore* datastore);
  */
 int repo_fsrepo_lmdb_close(int argc, char** argv, struct Datastore* datastore);
 
+/***
+ * Creates the directory
+ * @param datastore contains the path that needs to be created
+ * @returns true(1) on success
+ */
+int repo_fsrepo_lmdb_create_directory(struct Datastore* datastore);
+
 #endif

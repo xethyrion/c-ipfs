@@ -72,7 +72,7 @@ int config_path(char* config_root, char* extension, char* result, int max_len);
  * @param num_bits_for_keypair number of bits for the key pair
  * @returns true(1) on success, otherwise 0
  */
-int repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair, char* repo_path);
+int ipfs_repo_config_init(struct RepoConfig* config, unsigned int num_bits_for_keypair, char* repo_path);
 
 /***
  * Initialize memory for a RepoConfig struct

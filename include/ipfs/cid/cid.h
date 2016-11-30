@@ -5,6 +5,8 @@
 #ifndef __IPFS_CID_CID_H
 #define __IPFS_CID_CID_H
 
+#include <stddef.h>
+
 #define CID_PROTOBUF 0x70
 #define CID_CBOR 0x71
 #define CID_RAW 0x72
