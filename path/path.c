@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ipfs/cid/cid.h>
+#define IPFS_PATH_C
 #include <ipfs/path/path.h>
 
 // FromCid safely converts a cid.Cid type to a Path type
@@ -43,7 +44,7 @@ char** SplitN (char *p, char *delim, int n)
 
    r = calloc(sizeof(char*), n + 1); // splits plus NULL pointer termination
    if (!r) {
-      free(r);
+      free(rbuf);
       return NULL;
    }
 

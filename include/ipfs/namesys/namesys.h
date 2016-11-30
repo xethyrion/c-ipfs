@@ -82,6 +82,10 @@
     int IsTLD (char *s);
     int IsDomain (char *s);
 
+    typedef struct s_DNSResolver {
+        // TODO
+    } DNSResolver;
+
     int DNSResolverResolveOnce (DNSResolver *r, char **path, char *name);
     int workDomain (int output, DNSResolver *r, char *name);
     int parseEntry (char **Path, char *txt);
