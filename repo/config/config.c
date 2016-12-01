@@ -175,11 +175,16 @@ int ipfs_repo_config_new(struct RepoConfig** config) {
  */
 int ipfs_repo_config_free(struct RepoConfig* config) {
 	if (config != NULL) {
-		repo_config_identity_free(config->identity);
-		repo_config_bootstrap_peers_free(&(config->peer_addresses));
-		ipfs_repo_config_datastore_free(config->datastore);
-		repo_config_addresses_free(config->addresses);
-		repo_config_gateway_free(config->gateway);
+		if (config->identity != NULL)
+			repo_config_identity_free(config->identity);
+		if (&(config->peer_addresses) != NULL)
+			repo_config_bootstrap_peers_free(&(config->peer_addresses));
+		if (config->datastore != NULL)
+			ipfs_repo_config_datastore_free(config->datastore);
+		if (config->addresses != NULL)
+			repo_config_addresses_free(config->addresses);
+		if (config->gateway != NULL)
+			repo_config_gateway_free(config->gateway);
 		free(config);
 	}
 	return 1;

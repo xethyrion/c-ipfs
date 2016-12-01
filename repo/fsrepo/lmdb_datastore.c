@@ -16,7 +16,7 @@
  * @param block the block to be written
  * @returns true(1) on success
  */
-int repo_fsrepo_lmdb_put(const char* key, struct Block* block, struct Datastore* datastore) {
+int repo_fsrepo_lmdb_put(const char* key, size_t key_size, struct Block* block, struct Datastore* datastore) {
 	int retVal;
 	MDB_txn* mdb_txn;
 	MDB_dbi mdb_dbi;
@@ -36,7 +36,7 @@ int repo_fsrepo_lmdb_put(const char* key, struct Block* block, struct Datastore*
 		return 0;
 
 	// write
-	db_key.mv_size = strlen(key) + 1;
+	db_key.mv_size = key_size;
 	db_key.mv_data = (char*)key;
 	db_value.mv_size = block->data_length;
 	db_value.mv_data = block->data;
@@ -85,10 +85,9 @@ int repo_fsrepro_lmdb_open(int argc, char** argv, struct Datastore* datastore) {
  * @param argv parameters to be passed in
  * @param datastore the datastore struct that contains information about the opened database
  */
-int repo_fsrepo_lmdb_close(int argc, char** argv, struct Datastore* datastore) {
+int repo_fsrepo_lmdb_close(struct Datastore* datastore) {
 	struct MDB_env* mdb_env = (struct MDB_env*)datastore->handle;
 	mdb_env_close(mdb_env);
-	free(mdb_env);
 	return 1;
 }
 

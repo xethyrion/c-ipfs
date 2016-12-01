@@ -50,6 +50,6 @@ int ipfs_blockstore_put(struct Block* block, struct FSRepo* fs_repo) {
 		return 0;
 
 	// send to Put with key
-	fs_repo->config->datastore->datastore_put(key, block, fs_repo->config->datastore);
+	fs_repo->config->datastore->datastore_put(key, key_length, block, fs_repo->config->datastore);
 	return 0;
 }

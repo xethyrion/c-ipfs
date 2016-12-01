@@ -7,7 +7,6 @@
 #include <string.h>
 
 #include "ipfs/cid/cid.h"
-
 #include "libp2p/crypto/encoding/base58.h"
 #include "ipfs/multibase/multibase.h"
 #include "mh/multihash.h"

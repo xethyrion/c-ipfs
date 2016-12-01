@@ -76,13 +76,16 @@ int repo_config_write_config_file(char* full_filename, struct RepoConfig* config
 	fprintf(out_file, "  \"RecordLifetime\": \"\",\n");
 	fprintf(out_file, "  \"ResolveCacheSize\": %d\n", config->ipns.resolve_cache_size);
 	fprintf(out_file, " },\n \"Bootstrap\": [\n");
+	/*
 	for(int i = 0; i < config->peer_addresses.num_peers; i++) {
-		fprintf(out_file, "  \"%s\"", config->peer_addresses.peers[i]->entire_string);
+		struct IPFSAddr* peer = config->peer_addresses.peers[i];
+		fprintf(out_file, "  \"%s\"", peer->entire_string);
 		if (i < config->peer_addresses.num_peers - 1)
 			fprintf(out_file, ",\n");
 		else
 			fprintf(out_file, "\n");
 	}
+	*/
 	fprintf(out_file, " ],\n \"Tour\": {\n  \"Last\": \"\"\n },\n");
 	fprintf(out_file, " \"Gateway\": {\n");
 	fprintf(out_file, "  \"HTTPHeaders\": {\n");
@@ -136,7 +139,7 @@ int ipfs_repo_fsrepo_new(char* repo_path, struct RepoConfig* config, struct FSRe
 		(*repo)->config = config;
 	else {
 		if (ipfs_repo_config_new(&((*repo)->config)) == 0) {
-			free(repo_path);
+			free((*repo)->path);
 			return 0;
 		}
 	}
@@ -275,6 +278,8 @@ int _get_json_string_value(char* data, const jsmntok_t* tokens, int tok_length, 
 	// allocate memory
 	int str_len = curr_token.end - curr_token.start;
 	*result = malloc(sizeof(char) * str_len + 1);
+	if (*result == NULL)
+		return 0;
 	// copy in the string
 	strncpy(*result, &data[curr_token.start], str_len);
 	(*result)[str_len] = 0;

@@ -19,7 +19,7 @@ struct IPFSAddr {
  * @param string the string that contains the address
  * @returns true(1) on success, false(0) otherwise
  */
-int ipfsaddr_init_new(struct IPFSAddr** addr, char* string);
+int ipfsaddr_new(struct IPFSAddr** addr, char* string);
 
 /***
  * frees allocated memory in the struct

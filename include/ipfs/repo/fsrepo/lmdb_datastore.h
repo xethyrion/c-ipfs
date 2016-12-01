@@ -25,7 +25,7 @@ int repo_fsrepro_lmdb_open(int argc, char** argv, struct Datastore* datastore);
  * @param argv parameters to be passed in
  * @param datastore the datastore struct that contains information about the opened database
  */
-int repo_fsrepo_lmdb_close(int argc, char** argv, struct Datastore* datastore);
+int repo_fsrepo_lmdb_close(struct Datastore* datastore);
 
 /***
  * Creates the directory

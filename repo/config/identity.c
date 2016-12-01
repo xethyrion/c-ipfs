@@ -29,6 +29,8 @@ int repo_config_identity_build_peer_id(struct Identity* identity) {
 		return 0;
 
 	// copy it into the structure
+	if (identity->peer_id != NULL)
+		free(identity->peer_id);
 	identity->peer_id = (char*)malloc(sz + 1);
 	if (identity->peer_id == NULL)
 		return 0;
@@ -69,6 +71,8 @@ int repo_config_identity_new(struct Identity** identity) {
 	memset(*identity, 0, sizeof(struct Identity));
 
 	(*identity)->peer_id = NULL;
+	(*identity)->private_key.public_key_der = NULL;
+	(*identity)->private_key.der = NULL;
 
 	return 1;
 }

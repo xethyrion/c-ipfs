@@ -19,28 +19,68 @@ int testit(const char* name, int (*func)(void)) {
 	return retVal == 0;
 }
 
+const char* names[] = {
+		"test_cid_new_free",
+		"test_cid_cast_multihash",
+		"test_cid_cast_non_multihash",
+		//"test_init_new_installation",
+		"test_repo_config_new",
+		"test_repo_config_init",
+		"test_repo_config_write",
+		"test_repo_config_identity_new",
+		"test_repo_config_identity_private_key",
+		"test_get_init_command",
+		"test_repo_fsrepo_open_config",
+		"test_flatfs_get_directory",
+		"test_flatfs_get_filename",
+		"test_flatfs_get_full_filename",
+		"test_ds_key_from_binary",
+		"test_blocks_new",
+		"test_repo_bootstrap_peers_init",
+		"test_ipfs_datastore_put"
+};
+
+int (*funcs[])(void) = {
+		test_cid_new_free,
+		test_cid_cast_multihash,
+		test_cid_cast_non_multihash,
+		//test_init_new_installation,
+		test_repo_config_new,
+		test_repo_config_init,
+		test_repo_config_write,
+		test_repo_config_identity_new,
+		test_repo_config_identity_private_key,
+		test_get_init_command,
+		test_repo_fsrepo_open_config,
+		test_flatfs_get_directory,
+		test_flatfs_get_filename,
+		test_flatfs_get_full_filename,
+		test_ds_key_from_binary,
+		test_blocks_new,
+		test_repo_bootstrap_peers_init,
+		test_ipfs_datastore_put
+};
+
+/**
+ * run 1 test or run all
+ */
 int main(int argc, char** argv) {
 	int counter = 0;
-	/*
-	counter += testit("test_cid_new_free", test_cid_new_free);
-	counter += testit("test_cid_cast_multihash", test_cid_cast_multihash);
-	counter += testit("test_cid_cast_non_multihash", test_cid_cast_non_multihash);
-	counter += testit("test_init_new_installation", test_init_new_installation);
-	counter += testit("test_repo_config_new", test_repo_config_new);
-	counter += testit("test_repo_config_init", test_repo_config_init);
-	counter += testit("test_repo_config_write", test_repo_config_write);
-	counter += testit("test_repo_config_identity_new", test_repo_config_identity_new);
-	counter += testit("test_repo_config_identity_private_key", test_repo_config_identity_private_key);
-	counter += testit("test_repo_bootstrap_peers_init", test_repo_bootstrap_peers_init);
-	counter += testit("get_init_command", test_get_init_command);
-	counter += testit("test_fs_repo_open", test_repo_fsrepo_open_config);
-	counter += testit("test_flatfs_get_directory", test_flatfs_get_directory);
-	counter += testit("test_flatfs_get_filename", test_flatfs_get_filename);
-	counter += testit("test_flatfs_get_full_filename", test_flatfs_get_full_filename);
-	counter += testit("test_ds_key_from_binary", test_ds_key_from_binary);
-	counter += testit("test_blocks_new", test_blocks_new);
-	*/
-	counter += testit("test_ipfs_datastore_put", test_ipfs_datastore_put);
+	char* test_wanted;
+	int only_one = 0;
+	if(argc > 1) {
+		only_one = 1;
+		test_wanted = argv[1];
+	}
+	for (int i = 0; i < sizeof(funcs) / sizeof(funcs[0]); i++) {
+		if (only_one && strcmp(names[i], test_wanted) == 0)
+			counter += testit(names[i], funcs[i]);
+		else
+			if (!only_one)
+				counter += testit(names[i], funcs[i]);
+
+	}
+
 	if (counter > 0) {
 		printf("***** There were %d failed test(s) *****\n", counter);
 	} else {

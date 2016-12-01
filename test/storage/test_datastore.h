@@ -111,7 +111,6 @@ int test_ipfs_datastore_put() {
 	// build the ipfs repository, then shut it down, so we can start fresh
 	struct FSRepo* fs_repo;
 	retVal = make_ipfs_repository(fs_repo);
-	ipfs_repo_fsrepo_free(fs_repo);
 	if (retVal == 0)
 		return 0;
 
@@ -135,14 +134,21 @@ int test_ipfs_datastore_put() {
 	if (retVal == 0)
 		return 0;
 
+	/*
+
 	// send to Put with key
-	retVal = fs_repo->config->datastore->datastore_put(key, block, fs_repo->config->datastore);
+	retVal = fs_repo->config->datastore->datastore_put(key, key_length, block, fs_repo->config->datastore);
+	*/
 	if (retVal == 0)
 		return 0;
 
 	// save the block
 
 	// check the results
+
+	// clean up
+	ipfs_repo_fsrepo_free(fs_repo);
+	ipfs_blocks_block_free(block);
 
 	return 1;
 }

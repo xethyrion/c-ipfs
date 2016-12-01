@@ -12,7 +12,8 @@
 
 #include "ipfs/thirdparty/ipfsaddr/ipfs_addr.h"
 
-int ipfsaddr_init_new(struct IPFSAddr** addr, char* string) {
+int ipfsaddr_new(struct IPFSAddr** addr, char* string) {
+	(*addr) = malloc(sizeof(struct IPFSAddr));
 	(*addr)->entire_string = malloc(sizeof(char) * (strlen(string) + 1));
 	if ((*addr)->entire_string == NULL)
 		return 0;
@@ -21,7 +22,10 @@ int ipfsaddr_init_new(struct IPFSAddr** addr, char* string) {
 }
 
 int ipfsaddr_free(struct IPFSAddr* addr) {
-	if (addr->entire_string != NULL)
-		free(addr->entire_string);
+	if (addr != NULL) {
+		if (addr->entire_string != NULL)
+			free(addr->entire_string);
+		free(addr);
+	}
 	return 1;
 }
