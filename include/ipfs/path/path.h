@@ -35,4 +35,13 @@
    int ParseCidToPath (char *dst, char *txt);
    int ParsePath (char *dst, char *txt);
    int PathIsValid (char *p);
+
+   // Resolver provides path resolution to IPFS
+   // It has a pointer to a DAGService, which is uses to resolve nodes.
+   // TODO: now that this is more modular, try to unify this code with the
+   //       the resolvers in namesys
+   typedef struct s_resolver {
+       DAGService DAG;
+       int (*ResolveOnce)(NodeLink **lnk, Context ctx, DAGService *ds, Node **nd, char *name);
+   } Resolver;
 #endif // IPFS_PATH_H
