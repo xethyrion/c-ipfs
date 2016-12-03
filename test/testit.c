@@ -8,83 +8,47 @@
 #include "storage/test_ds_helper.h"
 #include "storage/test_datastore.h"
 #include "storage/test_blocks.h"
+#include "ipfs/node/node.h"
 
-int testit(const char* name, int (*func)(void)) {
-	printf("Testing %s...\n", name);
-	int retVal = func();
-	if (retVal)
-		printf("%s success!\n", name);
-	else
-		printf("** Uh oh! %s failed.**\n", name);
-	return retVal == 0;
-}
-
-const char* names[] = {
-		"test_cid_new_free",
-		"test_cid_cast_multihash",
-		"test_cid_cast_non_multihash",
-		//"test_init_new_installation",
-		"test_repo_config_new",
-		"test_repo_config_init",
-		"test_repo_config_write",
-		"test_repo_config_identity_new",
-		"test_repo_config_identity_private_key",
-		"test_get_init_command",
-		"test_repo_fsrepo_open_config",
-		"test_flatfs_get_directory",
-		"test_flatfs_get_filename",
-		"test_flatfs_get_full_filename",
-		"test_ds_key_from_binary",
-		"test_blocks_new",
-		"test_repo_bootstrap_peers_init",
-		"test_ipfs_datastore_put"
-};
-
-int (*funcs[])(void) = {
-		test_cid_new_free,
-		test_cid_cast_multihash,
-		test_cid_cast_non_multihash,
-		//test_init_new_installation,
-		test_repo_config_new,
-		test_repo_config_init,
-		test_repo_config_write,
-		test_repo_config_identity_new,
-		test_repo_config_identity_private_key,
-		test_get_init_command,
-		test_repo_fsrepo_open_config,
-		test_flatfs_get_directory,
-		test_flatfs_get_filename,
-		test_flatfs_get_full_filename,
-		test_ds_key_from_binary,
-		test_blocks_new,
-		test_repo_bootstrap_peers_init,
-		test_ipfs_datastore_put
-};
-
-/**
- * run 1 test or run all
- */
-int main(int argc, char** argv) {
-	int counter = 0;
-	char* test_wanted;
-	int only_one = 0;
-	if(argc > 1) {
-		only_one = 1;
-		test_wanted = argv[1];
-	}
-	for (int i = 0; i < sizeof(funcs) / sizeof(funcs[0]); i++) {
-		if (only_one && strcmp(names[i], test_wanted) == 0)
-			counter += testit(names[i], funcs[i]);
-		else
-			if (!only_one)
-				counter += testit(names[i], funcs[i]);
-
-	}
-
-	if (counter > 0) {
-		printf("***** There were %d failed test(s) *****\n", counter);
-	} else {
-		printf("All tests passed\n");
-	}
-	return 1;
+int main(int argc, char** argv)
+{
+	printf("XETH TESTS\n");
+	//Variables of link:
+	char * name = "Alex";
+	char * ahash = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG";
+	struct Link * mylink;
+	mylink = Create_Link(name,ahash);
+	printf("===================================\n"	\
+		   "Node Link:\n" 							\
+		   " -Name: %s\n"   						\
+		   " -Size: %lu\n"							\
+		   "\n Cid Details:\n\n"					\
+		   " -Version: %d\n"						\
+		   " -Codec: %c\n"							\
+		   " -Hash: %s\n"							\
+		   " -Hash Length: %lu\n"  					\
+		   "====================================\n" \
+		   , mylink->name, mylink->size, mylink->Lcid->version,mylink->Lcid->codec,mylink->Lcid->hash,mylink->Lcid->hash_length);
+	//Link Two for testing purposes
+	char * name2 = "Simo";
+	char * ahash2 = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnSimo";
+	struct Link * mylink2;
+	mylink2 = Create_Link(name2,ahash2);
+	//Nodes
+	struct Node * Mynode;
+	Mynode = N_Create_From_Link(mylink,sizeof(mylink));
+	mylink->name = "HAHA";//Testing for valid node creation
+	printf("Node Link[0] Name: %s\nHash: %s\n",Mynode->links[0]->name, Mynode->links[0]->Lcid->hash);
+	Mynode = N_Add_Link(&Mynode, mylink2, sizeof(mylink2));
+	mylink2->name = "HAHA";//Testing for valid node creation
+	printf("Node Link[1] Name: %s\nHash: %s\n",Mynode->links[1]->name,Mynode->links[1]->Lcid->hash);
+	struct Link * ResultLink = Node_Get_Link("Simo", Mynode);
+	printf("\nResultLink: \nName: %s\nHash: %s\n", ResultLink->name, ResultLink->Lcid->hash);
+	Node_Remove_Link("Simo", Mynode);
+	printf("Outlinkamt: %d\n", Mynode->link_ammount);
+	Free_Link(mylink);
+	Free_Link(mylink2);
+	Free_Link(ResultLink);
+	Node_Delete(Mynode);
+	return 0;
 }
